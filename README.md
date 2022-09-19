@@ -10,6 +10,16 @@
 
 RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. 
 
+# Implemented Algorithms
+| Algorithm | Remark | Paper | Code     |
+| :-----| :----- | :-----  |:---------|
+|GIRM|IRS|[Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)| [Link]() |
+|ICM|IRS|[Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)| [Link]() |
+| RE3 | IRS | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) | [Link]() |
+|RIDE|IRS|[RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)| [Link]() |
+|RND|IRS|[Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf%20http://arxiv.org/abs/1810.12894)| [Link]() |
+
+
 # Installation
 - Get the repository with git:
 ```
@@ -49,15 +59,6 @@ if __name__ == '__main__':
         k=3
     )
 ```
-
-# Implemented Algorithms
-| Algorithm | Remark | Paper | Code     |
-| :-----| :----- | :-----  |:---------|
-|GIRM|IRS|[Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)| [Link]() |
-|ICM|IRS|[Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)| [Link]() |
-| RE3 | IRS | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) | [Link]() |
-|RIDE|IRS|[RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)| [Link]() |
-|RND|IRS|[Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf%20http://arxiv.org/abs/1810.12894)| [Link]() |
 
 # Acknowledgments
 Some source codes of RLeXplore are built based on the following repositories:

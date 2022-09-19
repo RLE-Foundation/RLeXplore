@@ -3,6 +3,10 @@
 <img src='./docs/logo.jpg'>
 </div>
 
+<img src="https://img.shields.io/badge/Building-Pass-brightgreen">
+<img src="https://img.shields.io/badge/Framework-PyTorch-orange">
+<img src="https://img.shields.io/badge/Docs-Developing-blue">
+
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 
 RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. 

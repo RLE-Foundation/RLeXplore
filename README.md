@@ -3,9 +3,7 @@
 <img src='./docs/logo.jpg'>
 </div>
 
-<img src="https://img.shields.io/badge/Building-Pass-brightgreen">
-<img src="https://img.shields.io/badge/Framework-PyTorch-orange">
-<img src="https://img.shields.io/badge/Docs-Developing-blue">
+<img src="https://img.shields.io/badge/Building-Pass-brightgreen"> <img src="https://img.shields.io/badge/Framework-PyTorch-orange"> <img src="https://img.shields.io/badge/Docs-Developing-blue">
 
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)

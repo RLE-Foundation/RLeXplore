@@ -1,7 +1,7 @@
 
-<p style="text-align: center;">
+<div style="align: center;">
 <img src='./docs/logo.jpg'>
-</p>
+</div>
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 
@@ -25,8 +25,11 @@ pip install -r requirements.txt
 # Implemented Algorithms
 | Algorithm | Remark | Paper |    Code    |
 | :-----| :----- | :-----  | :----- |
+|GIRM|IRS|[Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)|[Code]()|
+|ICM|IRS|[Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)|[Code]()|
 | RE3 | IRS | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) | [Code]() |
 |RIDE|IRS|[RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)|[Code]()|
+|RND|IRS|[Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf%20http://arxiv.org/abs/1810.12894)|[Code]()|
 
 # Acknowledgments
 Some source codes of RLeXplore are built based on the following repositories:

@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：__init__.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/19 21:17 
 '''
 

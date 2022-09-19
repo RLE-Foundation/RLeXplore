@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines
 @File ：re3.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/19 20:35
 '''
 
@@ -90,12 +90,12 @@ class RE3(object):
         """
         Compute the intrinsic rewards using the collected observations.
         :param obs_array: The observations array of size ((n_steps, n_envs) + obs_shape).
-        :param time_steps: .
+        :param time_steps: The current time steps.
         :param k: The k value.
         :return: The intrinsic rewards
         """
 
-        # compute the weighting coefficient of timestep t.
+        # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
 
         obs_tensor = torch.from_numpy(obs_array)

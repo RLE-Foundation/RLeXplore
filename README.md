@@ -2,6 +2,7 @@
 <div style="align: center;">
 <img src='./docs/logo.jpg'>
 </div>
+![](https://img.shields.io/badge/Building-Pass-brightgreen)
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 

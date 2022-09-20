@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-@Project ：rl-exploration-baselines
-@File ：re3.py
-@Author ：YUAN Mingqi
-@Date ：2022/9/19 20:35
+@Project ：rl-exploration-baselines 
+@File ：rise.py
+@Author ：Fried
+@Date ：2022/9/20 13:38 
 '''
 
 from rlexplore.networks.encoder import CNNEncoder, MLPEncoder
 import torch
 import numpy as np
 
-class RE3(object):
+class RISE(object):
     def __init__(self,
                  envs,
                  device,
@@ -20,7 +20,7 @@ class RE3(object):
                  kappa
                  ):
         """
-        State Entropy Maximization with Random Encoders for Efficient Exploration (RE3)
+        Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning (RISE)
         Paper: http://proceedings.mlr.press/v139/seo21a/seo21a.pdf
 
         :param envs: The environment to learn from.
@@ -56,11 +56,12 @@ class RE3(object):
         for p in self.encoder.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, buffer, time_steps, k=3):
+    def compute_irs(self, buffer, time_steps, alpha=0.5, k=3):
         """
         Compute the intrinsic rewards using the collected observations.
         :param buffer: The experiences buffer.
         :param time_steps: The current time steps.
+        :param alpha: The order of Rényi divergence.
         :param k: The k value.
         :return: The intrinsic rewards
         """
@@ -77,7 +78,7 @@ class RE3(object):
             encoded_obs = self.encoder(obs_tensor[:, process])
             for step in range(size[0]):
                 dist = torch.norm(encoded_obs[step] - encoded_obs, p=2, dim=1)
-                H_step = torch.log(torch.kthvalue(dist, k + 1).values + 1.)
-                intrinsic_rewards[step, process] = H_step
+                D_step = torch.pow(torch.kthvalue(dist, k + 1).values, 1. - alpha)
+                intrinsic_rewards[step, process] = D_step
 
         return beta_t * intrinsic_rewards

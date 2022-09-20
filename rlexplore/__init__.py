@@ -10,4 +10,4 @@
 import os
 
 from rlexplore.re3 import RE3
-
+from rlexplore.rise import RISE

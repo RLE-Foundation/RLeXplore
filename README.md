@@ -79,3 +79,5 @@ if __name__ == '__main__':
 Some source codes of RLeXplore are built based on the following repositories:
 
 - [stable-baselines3](https://github.com/DLR-RM/stable-baselines3)
+- [GIRIL](https://github.com/xingruiyu/GIRIL)
+- []

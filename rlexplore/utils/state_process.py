@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：state_process.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/20 15:43 
 '''
 

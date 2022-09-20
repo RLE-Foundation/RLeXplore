@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 '''
 @Project ：rl-exploration-baselines 
-@File ：ppo_icm.py
+@File ：ppo_ride.py
 @Author ：YUAN Mingqi
-@Date ：2022/9/20 20:02 
+@Date ：2022/9/20 21:08 
 '''
 import os
 import sys
@@ -14,7 +14,7 @@ sys.path.append(parent_dir_path)
 
 import torch
 from stable_baselines3 import PPO
-from rlexplore.icm import ICM
+from rlexplore.ride import RIDE
 from rlexplore.utils import create_env
 
 if __name__ == '__main__':
@@ -30,8 +30,8 @@ if __name__ == '__main__':
         n_envs=n_envs,
         log_dir='./logs'
     )
-    # Create ICM module.
-    icm = ICM(
+    # Create RIDE module.
+    ride = RIDE(
         envs=envs,
         device=device,
         lr=0.00025,
@@ -51,7 +51,7 @@ if __name__ == '__main__':
             callback=callback
         )
         # Compute intrinsic rewards.
-        intrinsic_rewards = icm.compute_irs(
+        intrinsic_rewards = ride.compute_irs(
             buffer=model.rollout_buffer,
             time_steps=i * n_steps * n_envs)
         model.rollout_buffer.rewards += intrinsic_rewards

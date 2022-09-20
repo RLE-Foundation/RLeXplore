@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：random_encoder.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/20 13:44 
 '''
 

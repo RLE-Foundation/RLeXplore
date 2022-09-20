@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：icm.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/20 14:43 
 '''
 
@@ -25,6 +25,17 @@ class ICM(object):
                  beta,
                  kappa
                  ):
+        """
+        Curiosity-Driven Exploration by Self-Supervised Prediction
+        Paper: http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf
+
+        :param envs: The environment to learn from.
+        :param device: Device (cpu, cuda, ...) on which the code should be run.
+        :param lr: The learning rate of inverse and forward dynamics model.
+        :param batch_size: The batch size to train the dynamics model.
+        :param beta: The initial weighting coefficient of the intrinsic rewards.
+        :param kappa: The decay rate.
+        """
         self.device = device
         self.beta = beta
         self.kappa = kappa
@@ -73,7 +84,7 @@ class ICM(object):
         else:
             encoded_obs = obs
 
-        dataset = TensorDataset(encoded_obs[:n_steps - 1], actions[:n_steps - 1], encoded_obs[1:n_steps])
+        dataset = TensorDataset(encoded_obs[:-1], actions[:-1], encoded_obs[1:])
         loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
 
         for idx, batch_data in enumerate(loader):
@@ -114,11 +125,11 @@ class ICM(object):
                 else:
                     encoded_obs = obs[:, idx]
                 pred_next_obs = self.inverse_forward_model(
-                    encoded_obs[:n_steps - 1], actions[:n_steps - 1, idx], next_obs=None, training=False)
-                processed_next_obs = torch.clip(encoded_obs[1:n_steps], min=-1.0, max=1.0)
+                    encoded_obs[:-1], actions[:-1, idx], next_obs=None, training=False)
+                processed_next_obs = torch.clip(encoded_obs[1:], min=-1.0, max=1.0)
                 processed_pred_next_obs = torch.clip(pred_next_obs, min=-1.0, max=1.0)
 
-                intrinsic_rewards[:n_steps - 1, idx] = F.mse_loss(processed_pred_next_obs, processed_next_obs, reduction='mean').cpu().numpy()
+                intrinsic_rewards[:-1, idx] = F.mse_loss(processed_pred_next_obs, processed_next_obs, reduction='mean').cpu().numpy()
             # processed_next_obs = process(encoded_obs[1:n_steps], normalize=True, range=(-1, 1))
             # processed_pred_next_obs = process(pred_next_obs, normalize=True, range=(-1, 1))
         # train the icm

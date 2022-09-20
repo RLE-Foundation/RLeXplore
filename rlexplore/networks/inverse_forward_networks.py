@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：inverse_forward_networks.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/20 14:07 
 '''
 

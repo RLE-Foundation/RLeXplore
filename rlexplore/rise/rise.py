@@ -3,7 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：rise.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/20 13:38 
 '''
 
@@ -21,7 +21,7 @@ class RISE(object):
                  ):
         """
         Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning (RISE)
-        Paper: http://proceedings.mlr.press/v139/seo21a/seo21a.pdf
+        Paper: https://ieeexplore.ieee.org/abstract/document/9802917/
 
         :param envs: The environment to learn from.
         :param device: Device (cpu, cuda, ...) on which the code should be run.

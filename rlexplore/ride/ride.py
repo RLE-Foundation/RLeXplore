@@ -104,7 +104,7 @@ class RIDE:
             loss.backward(retain_graph=True)
             self.optimizer.step()
 
-    def pseudo_count(self,
+    def pseudo_counts(self,
                      encoded_obs,
                      k=10,
                      kernel_cluster_distance=0.008,
@@ -148,7 +148,7 @@ class RIDE:
                 dist = torch.norm(encoded_obs[:-1] - encoded_obs[1:], p=2, dim=1)
                 intrinsic_rewards[:-1, idx] = dist.cpu().numpy()
 
-                n_eps = self.pseudo_count(encoded_obs)
+                n_eps = self.pseudo_counts(encoded_obs)
                 intrinsic_rewards[:-1, idx] = n_eps[1:] * intrinsic_rewards[:-1, idx]
 
         self.update(buffer)

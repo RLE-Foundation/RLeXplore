@@ -1,5 +1,5 @@
 
-<div style="align: center;">
+<div style="text-align: center;">
 <img src='./docs/logo.jpg'>
 </div>
 
@@ -8,7 +8,8 @@
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 
-RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. 
+RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. In particular, RLeXplore is
+designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks.
 
 # Implemented Algorithms
 | Algorithm | Remark | Paper | Code     |
@@ -31,6 +32,7 @@ pip install -r requirements.txt
 ```
 
 # Usage Example
+The following code illustrates how to use RLeXplore with Stable-Baselines3:
 ```python
 import torch
 import numpy as np
@@ -63,5 +65,4 @@ if __name__ == '__main__':
 # Acknowledgments
 Some source codes of RLeXplore are built based on the following repositories:
 
-- [re3]()
-- []()
+- [stable-baselines3](https://github.com/DLR-RM/stable-baselines3)

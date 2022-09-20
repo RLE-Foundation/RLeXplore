@@ -3,7 +3,7 @@
 <img src='./docs/logo.jpg'>
 </div>
 
-<img src="https://img.shields.io/badge/Building-Pass-brightgreen"> <img src="https://img.shields.io/badge/Framework-PyTorch-orange"> <img src="https://img.shields.io/badge/Docs-Developing-blue">
+<img src="https://img.shields.io/badge/Python->=3.8-brightgreen"> <img src="https://img.shields.io/badge/PyTorch->=1.8.1-orange"> <img src="https://img.shields.io/badge/Docs-Developing-blue">
 
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             vec_env_cls=SubprocVecEnv,
         )
     # Create RE3 module.
-    re3 = RE3(envs=envs, device=device, embedding_size=64, beta=1e-2, kappa=1e-5)
+    re3 = RE3(envs=envs, device=device, latent_dim=64, beta=1e-2, kappa=1e-5)
     # Create PPO agent.
     model = PPO(policy='MlpPolicy', env=envs, n_steps=n_steps)
     _, callback = model._setup_learn(total_timesteps=total_time_steps, eval_env=None)

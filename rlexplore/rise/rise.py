@@ -7,7 +7,7 @@
 @Date ：2022/9/20 13:38 
 '''
 
-from rlexplore.networks.encoder import CNNEncoder, MLPEncoder
+from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
 import torch
 import numpy as np
 
@@ -15,7 +15,7 @@ class RISE(object):
     def __init__(self,
                  envs,
                  device,
-                 embedding_size,
+                 latent_dim,
                  beta,
                  kappa
                  ):
@@ -25,7 +25,7 @@ class RISE(object):
 
         :param envs: The environment to learn from.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
-        :param embedding_size: The dimension of encoding vectors of the observations.
+        :param latent_dim: The dimension of encoding vectors of the observations.
         :param beta: The initial weighting coefficient of the intrinsic rewards.
         :param kappa: The decay rate.
         """
@@ -43,11 +43,11 @@ class RISE(object):
         self.kappa = kappa
 
         if len(self.ob_shape) == 3:
-            self.encoder = CNNEncoder(
-                kwargs={'in_channels': self.ob_shape[0], 'embedding_size': embedding_size})
+            self.encoder = CnnEncoder(
+                kwargs={'in_channels': self.ob_shape[0], 'latent_dim': latent_dim})
         else:
-            self.encoder = MLPEncoder(
-                kwargs={'input_dim': self.ob_shape[0], 'embedding_size': embedding_size}
+            self.encoder = MlpEncoder(
+                kwargs={'input_dim': self.ob_shape[0], 'latent_dim': latent_dim}
             )
 
         self.encoder.to(self.device)
@@ -68,7 +68,7 @@ class RISE(object):
 
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-
+        # observations shape ((n_steps, n_envs) + obs_shape)
         obs_tensor = torch.from_numpy(buffer.observations)
         obs_tensor = obs_tensor.to(self.device)
         size = obs_tensor.size()

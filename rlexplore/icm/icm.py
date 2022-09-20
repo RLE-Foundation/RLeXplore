@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+@Project ：rl-exploration-baselines 
+@File ：icm.py
+@Author ：Fried
+@Date ：2022/9/20 14:43 
+'''
+
+from rlexplore.networks.inverse_forward_networks import InverseForwardDynamicsModel, CnnEncoder
+from rlexplore.utils.state_process import process
+
+from torch import nn, optim
+from torch.nn import functional as F
+from torch.utils.data import DataLoader, TensorDataset
+import torch
+import numpy as np
+
+class ICM(object):
+    def __init__(self,
+                 envs,
+                 device,
+                 lr,
+                 batch_size,
+                 beta,
+                 kappa
+                 ):
+        self.device = device
+        self.beta = beta
+        self.kappa = kappa
+        self.lr = lr
+        self.batch_size = batch_size
+
+        if envs.action_space.__class__.__name__ == "Discrete":
+            self.ob_shape = envs.observation_space.shape
+            self.action_shape = envs.action_space.n
+            self.action_type = 'dis'
+            self.inverse_forward_model = InverseForwardDynamicsModel(
+                kwargs={'latent_dim': 1024, 'action_dim': self.action_shape}
+            ).to(device)
+            self.im_loss = nn.CrossEntropyLoss()
+        elif envs.action_space.__class__.__name__ == 'Box':
+            self.ob_shape = envs.observation_space.shape
+            self.action_shape = envs.action_space.shape
+            self.action_type = 'cont'
+            self.inverse_forward_model = InverseForwardDynamicsModel(
+                kwargs={'latent_dim': self.ob_shape[0], 'action_dim': self.action_shape[0]}
+            ).to(device)
+            self.im_loss = nn.MSELoss()
+        else:
+            raise NotImplementedError
+        self.fm_loss = nn.MSELoss()
+
+        if len(self.ob_shape) == 3:
+            self.cnn_encoder = CnnEncoder(kwargs={'in_channels': 4}).to(device)
+
+        self.optimizer = optim.Adam(lr=self.lr, params=self.inverse_forward_model.parameters())
+
+    def update(self, buffer):
+        n_steps = torch.from_numpy(buffer.observations.shape[0])
+        obs = torch.from_numpy(buffer.observations)
+        actions = torch.from_numpy(buffer.actions)
+        if self.action_type == 'dis':
+            actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
+        obs = obs.to(self.device)
+        actions = actions.to(self.device)
+
+        if len(self.ob_shape) == 3:
+            encoded_obs = self.cnn_encoder(obs)
+        else:
+            encoded_obs = obs
+
+        dataset = TensorDataset(encoded_obs[:n_steps - 1], actions, encoded_obs[1:n_steps])
+        loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
+
+        for idx, batch_data in enumerate(loader):
+            batch_obs = batch_data[0]
+            batch_actions = batch_data[1]
+            batch_next_obs = batch_data[2]
+
+            pred_actions, pred_next_obs = self.inverse_forward_model(
+                batch_obs, batch_actions, batch_next_obs
+            )
+
+            loss = self.im_loss(pred_actions, batch_actions) + \
+                   self.fm_loss(pred_next_obs, batch_next_obs)
+
+            self.optimizer.zero_grad()
+            loss.backward(retain_graph=True)
+            self.optimizer.step()
+
+    def compute_irs(self, buffer, time_steps):
+        # compute the weighting coefficient of timestep t
+        beta_t = self.beta * np.power(1. - self.kappa, time_steps)
+
+        n_steps = torch.from_numpy(buffer.observations.shape[0])
+        obs = torch.from_numpy(buffer.observations)
+        actions = torch.from_numpy(buffer.actions)
+        if self.action_type == 'dis':
+            actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
+        obs = obs.to(self.device)
+        actions = actions.to(self.device)
+
+        with torch.no_grad():
+            if len(self.ob_shape) == 3:
+                encoded_obs = self.cnn_encoder()
+            else:
+                encoded_obs = obs
+
+            pred_next_obs = self.inverse_forward_model(
+                encoded_obs[:n_steps - 1], actions[:n_steps - 1], next_obs=None, training=False)
+            processed_next_obs = process(encoded_obs[1:n_steps], normalize=True, range=(-1, 1))
+            processed_pred_next_obs = process(pred_next_obs, normalize=True, range=(-1, 1))
+
+        intrinsic_rewards = F.mse_loss(processed_pred_next_obs, processed_next_obs, reduction='mean')
+
+        return beta_t * intrinsic_rewards

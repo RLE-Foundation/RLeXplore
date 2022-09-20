@@ -86,10 +86,10 @@ class RE3(object):
         for p in self.encoder.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, obs_array, time_steps, k=3):
+    def compute_irs(self, buffer, time_steps, k=3):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param obs_array: The observations array of size ((n_steps, n_envs) + obs_shape).
+        :param buffer: The experiences buffer.
         :param time_steps: The current time steps.
         :param k: The k value.
         :return: The intrinsic rewards
@@ -98,7 +98,7 @@ class RE3(object):
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
 
-        obs_tensor = torch.from_numpy(obs_array)
+        obs_tensor = torch.from_numpy(buffer.observations)
         obs_tensor = obs_tensor.to(self.device)
         size = obs_tensor.size()
         intrinsic_rewards = np.zeros(shape=(size[0], size[1]))

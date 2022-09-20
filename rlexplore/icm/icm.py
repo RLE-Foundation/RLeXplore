@@ -8,7 +8,7 @@
 '''
 
 from rlexplore.networks.inverse_forward_networks import InverseForwardDynamicsModel, CnnEncoder
-from rlexplore.utils.state_process import process
+# from rlexplore.utils.state_process import process
 
 from torch import nn, optim
 from torch.nn import functional as F
@@ -57,11 +57,14 @@ class ICM(object):
         self.optimizer = optim.Adam(lr=self.lr, params=self.inverse_forward_model.parameters())
 
     def update(self, buffer):
-        n_steps = torch.from_numpy(buffer.observations.shape[0])
-        obs = torch.from_numpy(buffer.observations)
-        actions = torch.from_numpy(buffer.actions)
+        n_steps = buffer.observations.shape[0]
+        n_envs = buffer.observations.shape[1]
+        obs = torch.from_numpy(buffer.observations).reshape(n_steps * n_envs, *self.ob_shape)
         if self.action_type == 'dis':
+            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, )
             actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
+        else:
+            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, self.action_shape[0])
         obs = obs.to(self.device)
         actions = actions.to(self.device)
 
@@ -70,7 +73,7 @@ class ICM(object):
         else:
             encoded_obs = obs
 
-        dataset = TensorDataset(encoded_obs[:n_steps - 1], actions, encoded_obs[1:n_steps])
+        dataset = TensorDataset(encoded_obs[:n_steps - 1], actions[:n_steps - 1], encoded_obs[1:n_steps])
         loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
 
         for idx, batch_data in enumerate(loader):
@@ -92,26 +95,33 @@ class ICM(object):
     def compute_irs(self, buffer, time_steps):
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
+        intrinsic_rewards = np.zeros_like(buffer.rewards)
 
-        n_steps = torch.from_numpy(buffer.observations.shape[0])
+        n_steps = buffer.observations.shape[0]
+        n_envs = buffer.observations.shape[1]
         obs = torch.from_numpy(buffer.observations)
         actions = torch.from_numpy(buffer.actions)
         if self.action_type == 'dis':
-            actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
+            # actions size: (n_steps, n_envs, 1)
+            actions = F.one_hot(actions[:, :, 0].to(torch.int64), self.action_shape).float()
         obs = obs.to(self.device)
         actions = actions.to(self.device)
 
         with torch.no_grad():
-            if len(self.ob_shape) == 3:
-                encoded_obs = self.cnn_encoder()
-            else:
-                encoded_obs = obs
+            for idx in range(n_envs):
+                if len(self.ob_shape) == 3:
+                    encoded_obs = self.cnn_encoder(obs[:, idx, :, :, :])
+                else:
+                    encoded_obs = obs[:, idx]
+                pred_next_obs = self.inverse_forward_model(
+                    encoded_obs[:n_steps - 1], actions[:n_steps - 1, idx], next_obs=None, training=False)
+                processed_next_obs = torch.clip(encoded_obs[1:n_steps], min=-1.0, max=1.0)
+                processed_pred_next_obs = torch.clip(pred_next_obs, min=-1.0, max=1.0)
 
-            pred_next_obs = self.inverse_forward_model(
-                encoded_obs[:n_steps - 1], actions[:n_steps - 1], next_obs=None, training=False)
-            processed_next_obs = process(encoded_obs[1:n_steps], normalize=True, range=(-1, 1))
-            processed_pred_next_obs = process(pred_next_obs, normalize=True, range=(-1, 1))
-
-        intrinsic_rewards = F.mse_loss(processed_pred_next_obs, processed_next_obs, reduction='mean')
+                intrinsic_rewards[:n_steps - 1, idx] = F.mse_loss(processed_pred_next_obs, processed_next_obs, reduction='mean').cpu().numpy()
+            # processed_next_obs = process(encoded_obs[1:n_steps], normalize=True, range=(-1, 1))
+            # processed_pred_next_obs = process(pred_next_obs, normalize=True, range=(-1, 1))
+        # train the icm
+        self.update(buffer)
 
         return beta_t * intrinsic_rewards

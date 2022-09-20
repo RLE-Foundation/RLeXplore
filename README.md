@@ -36,9 +36,8 @@ The following code illustrates how to use RLeXplore with Stable-Baselines3:
 ```python
 import torch
 from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
 from rlexplore.re3 import RE3
+from rlexplore.utils import create_env
 
 if __name__ == '__main__':
     device = torch.device('cuda:0')
@@ -48,11 +47,10 @@ if __name__ == '__main__':
     total_time_steps = 10000
     num_episodes = int(total_time_steps / n_steps / n_envs)
     # Create vectorized environments.
-    envs = make_vec_env(
+    envs = create_env(
             env_id=env_id,
             n_envs=n_envs,
-            monitor_dir='./logs',
-            vec_env_cls=SubprocVecEnv,
+            log_dir='./logs'
         )
     # Create RE3 module.
     re3 = RE3(envs=envs, device=device, latent_dim=64, beta=1e-2, kappa=1e-5)

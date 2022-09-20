@@ -12,14 +12,13 @@ RLeXplore is a set of implementations of exploration approaches in reinforcement
 designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks.
 
 # Implemented Algorithms
-| Algorithm | Remark | Paper | Code     |
-| :-----| :----- | :-----  |:---------|
-|GIRM|IRS|[Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)| [Link]() |
-|ICM|IRS|[Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)| [Link]() |
-| RE3 | IRS | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) | [Link]() |
-|RIDE|IRS|[RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)| [Link]() |
-|RND|IRS|[Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf%20http://arxiv.org/abs/1810.12894)| [Link]() |
-
+| Algorithm | Remark                            | Year | Paper                                                                                                                            | Code     |
+|:----------|:----------------------------------|:-----|:---------------------------------------------------------------------------------------------------------------------------------|:---------|
+| ICM       | Prediction-based exploration      | 2017 | [Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)           | [Link]()                                                                                                             |
+| RND       | Novelty-based exploration         | 2019 | [Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf%20http://arxiv.org/abs/1810.12894)             | [Link]()                                                                                                                         |
+| GIRM      | Prediction-based exploration      | 2020 | [Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)             | [Link]() |
+| RIDE      | IRS                               | 2020 | [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)            | [Link]()                                                                                                                         |
+| RE3       | Computation-efficient exploration | 2021 | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) | [Link]()                                                                                                               |
 
 # Installation
 - Get the repository with git:

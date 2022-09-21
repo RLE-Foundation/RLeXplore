@@ -12,6 +12,7 @@ import os
 from rlexplore.re3 import RE3
 from rlexplore.rise import RISE
 from rlexplore.ride import RIDE
+from rlexplore.ngu import NGU
 from rlexplore.rnd import RND
 from rlexplore.icm import ICM
 from rlexplore.girm import GIRM

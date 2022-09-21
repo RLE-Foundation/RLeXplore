@@ -64,8 +64,9 @@ class RIDE:
         self.fm_loss = nn.MSELoss()
 
         if len(self.ob_shape) == 3:
-            self.cnn_encoder = CnnEncoder(kwargs={'in_channels': 4}).to(device)
+            self.cnn_encoder = CnnEncoder(kwargs={'in_channels': self.ob_shape[0]})
 
+        self.cnn_encoder.to(device)
         self.optimizer = optim.Adam(lr=self.lr, params=self.inverse_forward_model.parameters())
 
     def update(self, buffer):

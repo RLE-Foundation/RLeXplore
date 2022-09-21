@@ -3,6 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：__init__.py.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/21 19:06 
 '''
+from rlexplore.ngu.ngu import NGU

@@ -3,6 +3,7 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：__init__.py.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/21 14:12 
 '''
+from rlexplore.girm.girm import GIRM

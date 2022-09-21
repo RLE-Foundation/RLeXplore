@@ -3,12 +3,43 @@
 '''
 @Project ：rl-exploration-baselines 
 @File ：girm_vae_encoder_decoder.py
-@Author ：Fried
+@Author ：YUAN Mingqi
 @Date ：2022/9/21 14:17 
 '''
 
 from torch import nn
 import torch
+
+
+class MlpEncoder(nn.Module):
+    def __init__(self, kwargs):
+        super(MlpEncoder, self).__init__()
+
+        self.main = nn.Sequential(
+            nn.Linear(kwargs['input_dim'], 64), nn.LeakyReLU(),
+            nn.Linear(64, 64), nn.LeakyReLU(),
+            nn.Linear(64, kwargs['latent_dim'])
+        )
+
+    def forward(self, obs, next_obs):
+        x = torch.cat((obs, next_obs), dim=1)
+        return self.main(x)
+
+
+class MlpDecoder(nn.Module):
+    def __init__(self, kwargs):
+        super(MlpDecoder, self).__init__()
+
+        self.main = nn.Sequential(
+            nn.Linear(kwargs['obs_dim'] + kwargs['action_dim'], 64), nn.LeakyReLU(),
+            nn.Linear(64, 64), nn.LeakyReLU(),
+            nn.Linear(64, kwargs['obs_dim'])
+        )
+
+    def forward(self, z, obs):
+        x = torch.cat((z, obs), dim=1)
+        return self.main(x)
+
 
 class CnnEncoder(nn.Module):
     def __init__(self, kwargs):
@@ -23,7 +54,6 @@ class CnnEncoder(nn.Module):
         self.conv4 = nn.Conv2d(64, 64, kernel_size=3, stride=2)
         self.bn4 = nn.BatchNorm2d(64)
 
-        self.linear = nn.Linear(kwargs['latent_dim'], kwargs['action_dim'])
         self.lrelu = nn.LeakyReLU()
 
         # Initialize the weights using xavier initialization
@@ -31,11 +61,9 @@ class CnnEncoder(nn.Module):
         nn.init.xavier_uniform_(self.conv2.weight)
         nn.init.xavier_uniform_(self.conv3.weight)
         nn.init.xavier_uniform_(self.conv4.weight)
-        nn.init.xavier_uniform_(self.linear.weight)
 
     def forward(self, obs, next_obs):
         x = torch.cat((obs, next_obs), dim=1)
-        print(x.size())
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.lrelu(x)
@@ -53,9 +81,9 @@ class CnnEncoder(nn.Module):
         x = self.lrelu(x)
 
         x = x.view(x.size(0), -1)
-        x = self.linear(x)
 
         return x
+
 
 class CnnDecoder(nn.Module):
     def __init__(self, kwargs):

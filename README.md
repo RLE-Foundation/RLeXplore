@@ -11,6 +11,8 @@
 RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. In particular, RLeXplore is
 designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks.
 
+Code test in progress! Welcome to contribute to this program!
+
 # Implemented Algorithms
 | Algorithm | Remark                             | Year | Paper                                                                                                                                             | Code                                                                                    |
 |:----------|:-----------------------------------|:-----|:--------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|

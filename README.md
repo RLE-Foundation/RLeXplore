@@ -2,7 +2,7 @@
 <img src='./docs/logo.jpg'>
 </div>
 
-<img src="https://img.shields.io/badge/Python->=3.8-brightgreen"> <img src="https://img.shields.io/badge/PyTorch->=1.8.1-orange"> <img src="https://img.shields.io/badge/Gym->=0.21.1-%23252422"> <img src="https://img.shields.io/badge/Pybullet-3.2.5-%2306d6a0">  <img src="https://img.shields.io/badge/DMC Suite-1.0.5-blue"> <img src="https://img.shields.io/badge/Docs-Developing-%23ff595e"> 
+<img src="https://img.shields.io/badge/Python->=3.8-brightgreen"> <img src="https://img.shields.io/badge/PyTorch->=1.8.1-orange"> <img src="https://img.shields.io/badge/Gym->=0.21.1-%23252422"> <img src="https://img.shields.io/badge/Pybullet-3.2.5-%2306d6a0">  <img src="https://img.shields.io/badge/DMC Suite-1.0.5-blue"> <img src="https://img.shields.io/badge/JAX-0.3.17-%238338ec"> <img src="https://img.shields.io/badge/Docs-Developing-%23ff595e"> 
 
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
@@ -11,6 +11,11 @@ RLeXplore is a set of implementations of exploration approaches in reinforcement
 designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks.
 
 Code test in progress! Welcome to contribute to this program!
+
+# Changelog
+**26/09/2022**
+- Update the RE3;
+- Try to introduce JAX to accelerate computation. See ```experimental``` folder.
 
 # Implemented Algorithms
 | Algorithm | Remark                             | Year | Paper                                                                                                                                             | Code                                                                                    |

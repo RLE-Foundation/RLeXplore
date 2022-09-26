@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-@Project ：rl-exploration-baselines
-@File ：re3.py
+@Project ：rl-exploration-baselines 
+@File ：re3.py.py
 @Author ：YUAN Mingqi
-@Date ：2022/9/19 20:35
+@Date ：2022/9/26 18:07 
 '''
 
 from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
@@ -13,10 +13,23 @@ import os
 import torch
 import numpy as np
 
+try:
+    import jax
+    import jax.numpy as jnp
+    # JAX version of the intrinsic reward function.
+    @jax.jit
+    def jax_compute_irs(encoded_obs, k):
+        dist = jnp.linalg.norm(jnp.expand_dims(encoded_obs, axis=1) - encoded_obs, ord=2, axis=2)
+        H_step = jnp.log(jnp.sort(dist, axis=1)[:, k + 1] + 1.)
+        return H_step
+except:
+    pass
+
 class RE3(object):
     def __init__(self,
                  envs,
                  device,
+                 enable_jax,
                  latent_dim,
                  beta,
                  kappa
@@ -27,6 +40,7 @@ class RE3(object):
 
         :param envs: The environment to learn from.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
+        :param enable_jax: Use JAX to accelerate the copmutation.
         :param latent_dim: The dimension of encoding vectors of the observations.
         :param beta: The initial weighting coefficient of the intrinsic rewards.
         :param kappa: The decay rate.
@@ -41,6 +55,7 @@ class RE3(object):
         else:
             raise NotImplementedError
         self.device = device
+        self.enable_jax = enable_jax
         self.beta = beta
         self.kappa = kappa
 
@@ -53,6 +68,9 @@ class RE3(object):
             )
 
         self.encoder.to(self.device)
+        if self.enable_jax:
+            # allocate GPU memory as needed
+            os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = "false"
 
         # freeze the network parameters
         for p in self.encoder.parameters():
@@ -77,9 +95,14 @@ class RE3(object):
         obs_tensor = torch.from_numpy(buffer.observations)
         obs_tensor = obs_tensor.to(self.device)
 
-        for idx in range(n_envs):
-            encoded_obs = self.encoder(obs_tensor[:, idx])
-            dist = torch.norm(encoded_obs.unsqueeze(1) - encoded_obs, p=2, dim=2)
-            intrinsic_rewards[:, idx] = torch.log(torch.kthvalue(dist, k + 1, dim=1).values + 1.).cpu().numpy()
+        if self.enable_jax:
+            for idx in range(n_envs):
+                encoded_obs = self.encoder(obs_tensor[:, idx])
+                intrinsic_rewards[:, idx] = jax_compute_irs(encoded_obs.cpu().numpy(), k)
+        else:
+            for idx in range(n_envs):
+                encoded_obs = self.encoder(obs_tensor[:, idx])
+                dist = torch.norm(encoded_obs.unsqueeze(1) - encoded_obs, p=2, dim=2)
+                intrinsic_rewards[:, idx] = torch.log(torch.kthvalue(dist, k + 1, dim=1).values + 1.).cpu().numpy()
 
         return beta_t * intrinsic_rewards

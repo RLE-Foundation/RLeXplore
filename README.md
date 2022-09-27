@@ -17,6 +17,11 @@ designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-R
 Code test in progress! Welcome to contribute to this program!
 
 # Changelog
+**27/09/2022**
+- Update the RISE;
+- Introduce JAX in RISE. See ```experimental``` folder.
+
+
 **26/09/2022**
 - Update the RE3;
 - Try to introduce JAX to accelerate computation. See ```experimental``` folder.

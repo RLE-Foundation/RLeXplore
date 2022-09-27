@@ -14,7 +14,8 @@ designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-R
 <img src='./docs/flowchart.png' style="width: 600px">
 </div>
 
-Code test in progress! Welcome to contribute to this program!
+- Support for **off-policy** algorithms is under development.
+- Code test in progress! Welcome to contribute to this program!
 
 # Changelog
 **27/09/2022**

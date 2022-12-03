@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ```
 
 # Usage Example
-In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are ![](https://latex.codecogs.com/svg.image?(N_{steps},N_{envs},Obs\:shape)). Take RE3 for instance, it computes the intrinsic reward for each transition by
+In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are ![](https://latex.codecogs.com/svg.image?(N_{steps},N_{envs},Obs\\:shape)). Take RE3 for instance, it computes the intrinsic reward for each transition by
 
 <div align=center>
 <img src='https://latex.codecogs.com/svg.image?I_{t}=\log(\Vert\boldsymbol{y}_{t}-\tilde{\boldsymbol{y}}_{t}\Vert_{2}&plus;1)'>

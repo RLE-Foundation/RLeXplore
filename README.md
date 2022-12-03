@@ -27,12 +27,14 @@ pip install -r requirements.txt
 ```
 
 # Usage Example
-In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are $(N_{steps},N_{envs},Obs\_shape)$. Take RE3 for instance, it computes the intrinsic reward for each transition by
+In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are $(N_{steps},N_{envs},Obs\:shape)$. Take RE3 for instance, it computes the intrinsic reward for each transition by
+
 $$
-I_{t}=\log(\Vert\bm{y}_{t}-\tilde{\bm{y}}_{t}\Vert_{2}+1),
+I_{t}=\log(\Vert\boldsymbol{y}_{t}-\tilde{\boldsymbol{y}}_{t}\Vert_{2}+1),
 $$
-where $\bm{y}_{t}=f_{\bm{\theta}}(\bm{s}_t)$ is a fixed representation from a random encoder and $\tilde{\bm{y}}_{t}$ is the $k$-nearest
-neighbor of $\bm{y}_{t}$ within a set of $N$ representations $\{\bm{y}_{1},\bm{y}_{2},\dots,\bm{y}_{N}\}$. The following code provides a usage example of RE3:
+
+where $\boldsymbol{y}_{t}=f_{\boldsymbol{\theta}}(\boldsymbol{s}_t)$ is a fixed representation from a random encoder and $\tilde{\boldsymbol{y}}_{t}$ is the $k$-nearest
+neighbor of $\boldsymbol{y}_{t}$ within a set of $N$ representations $\{\boldsymbol{y}_{1},\boldsymbol{y}_{2},\dots,\boldsymbol{y}_{N}\}$. The following code provides a usage example of RE3:
 ```python
 import torch
 import numpy as np

@@ -13,45 +13,26 @@ RLeXplore is a set of implementations of exploration approaches in reinforcement
 <img src='./docs/flowchart.png' style="width: 600px">
 </div>
 
+- See [Changelog](#changelog) and [Implemented Algorithms](#implemented-algorithms);
 - Code test in progress! Welcome to contribute to this program!
-
-# Changelog
-**03/12/2022**
-- We start to reconstruct the project to make it be compatible with arbitrary tasks;
-- Update RE3.
-
-**27/09/2022**
-- Update the RISE;
-- Introduce JAX in RISE. See ```experimental``` folder.
-
-
-**26/09/2022**
-- Update the RE3;
-- Try to introduce JAX to accelerate computation. See ```experimental``` folder.
-
-# Implemented Algorithms
-| Algorithm | Remark                             | Year | Paper                                                                                                                                             | Code                                                                                    |
-|:----------|:-----------------------------------|:-----|:--------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
-| ICM       | Prediction-based exploration       | 2017 | [Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)                            | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/icm)  |
-| RND       | Novelty-based exploration          | 2019 | [Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf)                                                                | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rnd)  |
-| GIRM      | Prediction-based exploration       | 2020 | [Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)                              | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/girm) |
-| NGU       | Memory-based exploration           | 2020 | [Never Give Up: Learning Directed Exploration Strategies](https://arxiv.org/pdf/2002.06038)                                                       | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ngu)  |
-| RIDE      | Procedurally-generated environment | 2020 | [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)                             | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ride) |
-| RE3       | Computation-efficient exploration  | 2021 | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf)                  | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/re3)  |
-| RISE      | Computation-efficient exploration  | 2022 | [Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9802917/) | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rise) |
 
 # Installation
 - Get the repository with git:
 ```
 git clone https://github.com/yuanmingqi/rl-exploration-baselines.git
 ```
-Run the following command to get dependencies:
+- Run the following command to get dependencies:
 ```shell
 pip install -r requirements.txt
 ```
 
 # Usage Example
-The following code illustrates how to use RLeXplore with Stable-Baselines3:
+In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are $(N_{steps},N_{envs},Obs\_shape)$. Take RE3 for instance, it computes the intrinsic reward for each transition by
+$$
+I_{t}=\log(\Vert\bm{y}_{t}-\tilde{\bm{y}}_{t}\Vert_{2}+1),
+$$
+where $\bm{y}_{t}=f_{\bm{\theta}}(\bm{s}_t)$ is a fixed representation from a random encoder and $\tilde{\bm{y}}_{t}$ is the $k$-nearest
+neighbor of $\bm{y}_{t}$ within a set of $N$ representations $\{\bm{y}_{1},\bm{y}_{2},\dots,\bm{y}_{N}\}$. The following code provides a usage example of RE3:
 ```python
 import torch
 import numpy as np
@@ -84,7 +65,34 @@ if __name__ == '__main__':
 
     print(intrinsic_rewards.shape, type(intrinsic_rewards))
     print(intrinsic_rewards)
+
+# Output: (256, 16, 1) <class 'numpy.ndarray'>
 ```
+
+# Implemented Algorithms
+| Algorithm | Remark                             | Year | Paper                                                                                                                                             | Code                                                                                    |
+|:----------|:-----------------------------------|:-----|:--------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| ICM       | Prediction-based exploration       | 2017 | [Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)                            | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/icm)  |
+| RND       | Novelty-based exploration          | 2019 | [Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf)                                                                | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rnd)  |
+| GIRM      | Prediction-based exploration       | 2020 | [Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)                              | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/girm) |
+| NGU       | Memory-based exploration           | 2020 | [Never Give Up: Learning Directed Exploration Strategies](https://arxiv.org/pdf/2002.06038)                                                       | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ngu)  |
+| RIDE      | Procedurally-generated environment | 2020 | [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)                             | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ride) |
+| RE3       | Computation-efficient exploration  | 2021 | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf)                  | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/re3)  |
+| RISE      | Computation-efficient exploration  | 2022 | [Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9802917/) | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rise) |
+
+# Changelog
+**03/12/2022**
+- We start to reconstruct the project to make it compatible with arbitrary tasks;
+- Update RE3 and RISE.
+
+**27/09/2022**
+- Update the RISE;
+- Introduce JAX in RISE. See ```experimental``` folder.
+
+
+**26/09/2022**
+- Update the RE3;
+- Try to introduce JAX to accelerate computation. See ```experimental``` folder.
 
 # Acknowledgments
 Some source codes of RLeXplore are built based on the following repositories:

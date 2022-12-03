@@ -4,7 +4,7 @@
 @Project ：rl-exploration-baselines 
 @File ：rise.py
 @Author ：YUAN Mingqi
-@Date ：2022/9/20 13:38 
+@Date ：2022/12/03 13:38 
 '''
 
 from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
@@ -13,7 +13,8 @@ import numpy as np
 
 class RISE(object):
     def __init__(self,
-                 envs,
+                 obs_shape,
+                 action_shape,
                  device,
                  latent_dim,
                  beta,
@@ -23,32 +24,24 @@ class RISE(object):
         Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning (RISE)
         Paper: https://ieeexplore.ieee.org/abstract/document/9802917/
 
-        :param envs: The environment to learn from.
+        :param obs_shape: The data shape of observations.
+        :param action_shape: The data shape of actions.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
         :param latent_dim: The dimension of encoding vectors of the observations.
         :param beta: The initial weighting coefficient of the intrinsic rewards.
         :param kappa: The decay rate.
         """
 
-        if envs.action_space.__class__.__name__ == "Discrete":
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.n
-        elif envs.action_space.__class__.__name__ == 'Box':
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.shape
-        else:
-            raise NotImplementedError
+        self.obs_shape = obs_shape
+        self.action_shape = action_shape
         self.device = device
         self.beta = beta
         self.kappa = kappa
 
-        if len(self.ob_shape) == 3:
-            self.encoder = CnnEncoder(
-                kwargs={'in_channels': self.ob_shape[0], 'latent_dim': latent_dim})
+        if len(self.obs_shape) == 3:
+            self.encoder = CnnEncoder(obs_shape, latent_dim)
         else:
-            self.encoder = MlpEncoder(
-                kwargs={'input_dim': self.ob_shape[0], 'latent_dim': latent_dim}
-            )
+            self.encoder = MlpEncoder(obs_shape, latent_dim)
 
         self.encoder.to(self.device)
 
@@ -56,10 +49,10 @@ class RISE(object):
         for p in self.encoder.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, buffer, time_steps, alpha=0.5, k=3):
+    def compute_irs(self, batch_obs, time_steps, alpha=0.5, k=3, average_entropy=True):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param buffer: The experiences buffer.
+        :param batch_obs: The mini-batch of observations.
         :param time_steps: The current time steps.
         :param alpha: The order of Rényi divergence.
         :param k: The k value.
@@ -68,17 +61,24 @@ class RISE(object):
 
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        intrinsic_rewards = np.zeros_like(buffer.rewards)
+        n_steps = batch_obs.shape[0]
+        n_envs = batch_obs.shape[1]
+        intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
 
         # observations shape ((n_steps, n_envs) + obs_shape)
-        obs_tensor = torch.from_numpy(buffer.observations)
+        obs_tensor = torch.from_numpy(batch_obs)
         obs_tensor = obs_tensor.to(self.device)
 
         for idx in range(n_envs):
-            encoded_obs = self.encoder(obs_tensor[:, idx])
-            dist = torch.norm(encoded_obs.unsqueeze(1) - encoded_obs, p=2, dim=2)
-            intrinsic_rewards[:, idx] = torch.pow(torch.kthvalue(dist, k + 1).values, 1. - alpha).cpu()
+            src_feats = self.encoder(obs_tensor[:, idx])
+            dist = torch.linalg.vector_norm(src_feats.unsqueeze(1) - src_feats, ord=2, dim=2)
+            if average_entropy:
+                for sub_k in range(k):
+                    intrinsic_rewards[:, idx, 0] += torch.pow(
+                        torch.kthvalue(dist, sub_k + 1, dim=1).values, 1. - alpha).cpu().numpy()
+                intrinsic_rewards[:, idx, 0] /= k
+            else:
+                intrinsic_rewards[:, idx, 0] = torch.pow(
+                        torch.kthvalue(dist, k + 1, dim=1).values, 1. - alpha).cpu().numpy()
 
         return beta_t * intrinsic_rewards

@@ -54,7 +54,7 @@ class RE3(object):
     def compute_irs(self, batch_obs, time_steps, k=3, average_entropy=True):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param obs: The mini-batch of observations.
+        :param batch_obs: The mini-batch of observations.
         :param time_steps: The current time steps.
         :param k: The k value.
         :param average_entropy: Use the average of entropy estimation.

@@ -7,17 +7,19 @@
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 
-RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. In particular, RLeXplore is
-designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks.
+RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. 
 
 <div align=center>
 <img src='./docs/flowchart.png' style="width: 600px">
 </div>
 
-- Support for **off-policy** algorithms is under development.
 - Code test in progress! Welcome to contribute to this program!
 
 # Changelog
+**03/12/2022**
+- We start to reconstruct the project to make it be compatible with arbitrary tasks;
+- Update RE3.
+
 **27/09/2022**
 - Update the RISE;
 - Introduce JAX in RISE. See ```experimental``` folder.
@@ -52,44 +54,36 @@ pip install -r requirements.txt
 The following code illustrates how to use RLeXplore with Stable-Baselines3:
 ```python
 import torch
-from stable_baselines3 import PPO
+import numpy as np
 from rlexplore.re3 import RE3
-from rlexplore.utils import create_env
 
 if __name__ == '__main__':
+    ''' env setup '''
     device = torch.device('cuda:0')
-    env_id = 'AntBulletEnv-v0'
-    n_envs = 2
-    n_steps = 128
-    total_time_steps = 10000
-    num_episodes = int(total_time_steps / n_steps / n_envs)
-    # Create vectorized environments.
-    envs = create_env(
-            env_id=env_id,
-            n_envs=n_envs,
-            log_dir='./logs'
-        )
-    # Create RE3 module.
-    re3 = RE3(envs=envs, device=device, latent_dim=64, beta=1e-2, kappa=1e-5)
-    # Create PPO agent.
-    model = PPO(policy='MlpPolicy', env=envs, n_steps=n_steps)
-    _, callback = model._setup_learn(total_timesteps=total_time_steps, eval_env=None)
+    obs_shape = (4, 84, 84)
+    action_shape = 7
+    n_envs = 16 
+    n_steps = 256 
+    batch_obs = np.random.randn(n_steps, n_envs, *obs_shape).astype('float32')
 
-    for i in range(num_episodes):
-        model.collect_rollouts(
-            env=envs,
-            rollout_buffer=model.rollout_buffer,
-            n_rollout_steps=n_steps,
-            callback=callback
-        )
-        # Compute intrinsic rewards.
-        intrinsic_rewards = re3.compute_irs(
-            buffer=model.rollout_buffer,
-            time_steps=i * n_steps * n_envs,
-            k=3)
-        model.rollout_buffer.rewards += intrinsic_rewards
-        # Update policy using the currently gathered rollout buffer.
-        model.train()
+    ''' create RE3 instance '''
+    re3 = RE3(
+        obs_shape=obs_shape, 
+        action_shape=action_shape, 
+        device=device,
+        latent_dim=128,
+        beta=0.05,
+        kappa=0.00001)
+
+    ''' compute intrinsic rewards '''
+    intrinsic_rewards = re3.compute_irs(
+        batch_obs=batch_obs,
+        time_steps=25600,
+        k=3,
+        average_entropy=True)
+
+    print(intrinsic_rewards.shape, type(intrinsic_rewards))
+    print(intrinsic_rewards)
 ```
 
 # Acknowledgments

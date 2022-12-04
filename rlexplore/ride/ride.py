@@ -4,25 +4,20 @@
 @Project ：rl-exploration-baselines 
 @File ：ride.py
 @Author ：YUAN Mingqi
-@Date ：2022/9/20 13:47 
+@Date ：2022/12/04 13:47 
 '''
 
-from rlexplore.networks.inverse_forward_networks import InverseForwardDynamicsModel, CnnEncoder
+from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
 
-from torch import nn, optim
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, TensorDataset
 import torch
 import numpy as np
 
-
-
 class RIDE:
     def __init__(self,
-                 envs,
+                 obs_shape,
+                 action_shape,
                  device,
-                 lr,
-                 batch_size,
+                 latent_dim,
                  beta,
                  kappa
                  ):
@@ -30,97 +25,45 @@ class RIDE:
         RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments
         Paper: https://arxiv.org/pdf/2002.12292
 
-        :param envs: The environment to learn from.
+        :param obs_shape: The data shape of observations.
+        :param action_shape: The data shape of actions.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
-        :param lr: The learning rate of inverse and forward dynamics model.
-        :param batch_size: The batch size to train the dynamics model.
+        :param latent_dim: The dimension of encoding vectors of the observations.
         :param beta: The initial weighting coefficient of the intrinsic rewards.
         :param kappa: The decay rate.
         """
+
+        self.obs_shape = obs_shape
+        self.action_shape = action_shape
         self.device = device
         self.beta = beta
         self.kappa = kappa
-        self.lr = lr
-        self.batch_size = batch_size
 
-        if envs.action_space.__class__.__name__ == "Discrete":
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.n
-            self.action_type = 'dis'
-            self.inverse_forward_model = InverseForwardDynamicsModel(
-                kwargs={'latent_dim': 1024, 'action_dim': self.action_shape}
-            ).to(device)
-            self.im_loss = nn.CrossEntropyLoss()
-        elif envs.action_space.__class__.__name__ == 'Box':
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.shape
-            self.action_type = 'cont'
-            self.inverse_forward_model = InverseForwardDynamicsModel(
-                kwargs={'latent_dim': self.ob_shape[0], 'action_dim': self.action_shape[0]}
-            ).to(device)
-            self.im_loss = nn.MSELoss()
+        if len(self.obs_shape) == 3:
+            self.encoder = CnnEncoder(obs_shape, latent_dim)
         else:
-            raise NotImplementedError
-        self.fm_loss = nn.MSELoss()
+            self.encoder = MlpEncoder(obs_shape, latent_dim)
 
-        if len(self.ob_shape) == 3:
-            self.cnn_encoder = CnnEncoder(kwargs={'in_channels': self.ob_shape[0]})
-
-        self.cnn_encoder.to(device)
-        self.optimizer = optim.Adam(lr=self.lr, params=self.inverse_forward_model.parameters())
-
-    def update(self, buffer):
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations).reshape(n_steps * n_envs, *self.ob_shape)
-        if self.action_type == 'dis':
-            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, )
-            actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
-        else:
-            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, self.action_shape[0])
-        obs = obs.to(self.device)
-        actions = actions.to(self.device)
-
-        if len(self.ob_shape) == 3:
-            encoded_obs = self.cnn_encoder(obs)
-        else:
-            encoded_obs = obs
-
-        dataset = TensorDataset(encoded_obs[:n_steps - 1], actions[:n_steps - 1], encoded_obs[1:n_steps])
-        loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
-
-        for idx, batch_data in enumerate(loader):
-            batch_obs = batch_data[0]
-            batch_actions = batch_data[1]
-            batch_next_obs = batch_data[2]
-
-            pred_actions, pred_next_obs = self.inverse_forward_model(
-                batch_obs, batch_actions, batch_next_obs
-            )
-
-            loss = self.im_loss(pred_actions, batch_actions) + \
-                   self.fm_loss(pred_next_obs, batch_next_obs)
-
-            self.optimizer.zero_grad()
-            loss.backward(retain_graph=True)
-            self.optimizer.step()
+        self.encoder.to(self.device)
+        # freeze the network parameters
+        for p in self.encoder.parameters():
+            p.requires_grad = False
 
     def pseudo_counts(self,
-                     encoded_obs,
+                     src_feats,
                      k=10,
                      kernel_cluster_distance=0.008,
                      kernel_epsilon=0.0001,
                      c=0.001,
-                     sm=8,
-                     ):
-        counts = np.zeros(shape=(encoded_obs.size()[0], ))
-        for step in range(encoded_obs.size(0)):
-            ob_dist = torch.norm(encoded_obs[step] - encoded_obs, p=2, dim=1)
+                     sm=8):
+        counts = np.zeros(shape=(src_feats.size()[0], ))
+        for step in range(src_feats.size()[0]):
+            ob_dist = torch.norm(src_feats[step] - src_feats, p=2, dim=1)
             ob_dist = torch.sort(ob_dist).values
             ob_dist = ob_dist[:k]
             dist = ob_dist.cpu().numpy()
-            # TODO: moving average
-            dist = dist / np.mean(dist)
+            # moving average
+            dist = dist / np.mean(dist + 1e-11)
             dist = np.max(dist - kernel_cluster_distance, 0)
             kernel = kernel_epsilon / (dist + kernel_epsilon)
             s = np.sqrt(np.sum(kernel)) + c
@@ -130,29 +73,29 @@ class RIDE:
             else:
                 counts[step] = 1 / s
         return counts
-
-    def compute_irs(self, buffer, time_steps):
-        # compute the weighting coefficient of timestep t
+    
+    
+    def compute_irs(self, batch_obs, time_steps):
+        """
+        Compute the intrinsic rewards using the collected observations.
+        :param batch_obs: The mini-batch of observations.
+        :param time_steps: The current time steps.
+        :return: The intrinsic rewards
+        """
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        intrinsic_rewards = np.zeros_like(buffer.rewards)
+        n_steps = batch_obs.shape[0]
+        n_envs = batch_obs.shape[1]
+        intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
 
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations)
-        obs = obs.to(self.device)
+        # observations shape ((n_steps, n_envs) + obs_shape)
+        obs_tensor = torch.from_numpy(batch_obs)
+        obs_tensor = obs_tensor.to(self.device)
+
         with torch.no_grad():
             for idx in range(n_envs):
-                if len(self.ob_shape) == 3:
-                    encoded_obs = self.cnn_encoder(obs[:, idx, :, :, :])
-                else:
-                    encoded_obs = obs[:, idx]
-                dist = torch.norm(encoded_obs[:-1] - encoded_obs[1:], p=2, dim=1)
-                intrinsic_rewards[:-1, idx] = dist.cpu().numpy()
-
-                n_eps = self.pseudo_counts(encoded_obs)
-                intrinsic_rewards[:-1, idx] = n_eps[1:] * intrinsic_rewards[:-1, idx]
-
-        self.update(buffer)
-
+                src_feats = self.encoder(obs_tensor[:, idx])
+                dist = torch.linalg.vector_norm(src_feats[:-1] - src_feats[1:], ord=2, dim=1)
+                n_eps = self.pseudo_counts(src_feats)
+                intrinsic_rewards[:-1, idx, 0] = n_eps[1:] * dist.cpu().numpy()
+            
         return beta_t * intrinsic_rewards
-

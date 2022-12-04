@@ -16,7 +16,8 @@ import numpy as np
 
 class RND(object):
     def __init__(self,
-                 envs,
+                 obs_shape,
+                 action_shape,
                  device,
                  latent_dim,
                  lr,
@@ -28,7 +29,8 @@ class RND(object):
         Exploration by Random Network Distillation (RND)
         Paper: https://arxiv.org/pdf/1810.12894.pdf
 
-        :param envs: The environment to learn from.
+        :param obs_shape: The data shape of observations.
+        :param action_shape: The data shape of actions.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
         :param latent_dim: The dimension of encoding vectors of the observations.
         :param lr: The learning rate of predictor network.
@@ -37,87 +39,74 @@ class RND(object):
         :param kappa: The decay rate.
         """
 
-        if envs.action_space.__class__.__name__ == "Discrete":
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.n
-        elif envs.action_space.__class__.__name__ == 'Box':
-            self.ob_shape = envs.observation_space.shape
-            self.action_shape = envs.action_space.shape
-        else:
-            raise NotImplementedError
+        self.obs_shape = obs_shape
+        self.action_shape = action_shape
         self.device = device
         self.lr = lr
         self.batch_size = batch_size
         self.beta = beta
         self.kappa = kappa
 
-        if len(self.ob_shape) == 3:
-            self.predictor_network = CnnEncoder(
-                kwargs={'in_channels': self.ob_shape[0], 'latent_dim': latent_dim})
-            self.target_network = CnnEncoder(
-                kwargs={'in_channels': self.ob_shape[0], 'latent_dim': latent_dim})
+        if len(self.obs_shape) == 3:
+            self.predictor = CnnEncoder(obs_shape, latent_dim)
+            self.target = CnnEncoder(obs_shape, latent_dim)
         else:
-            self.predictor_network = MlpEncoder(
-                kwargs={'input_dim': self.ob_shape[0], 'latent_dim': latent_dim}
-            )
-            self.predictor_network = MlpEncoder(
-                kwargs={'input_dim': self.ob_shape[0], 'latent_dim': latent_dim}
-            )
+            self.predictor = MlpEncoder(obs_shape, latent_dim)
+            self.target = MlpEncoder(obs_shape, latent_dim)
 
-        self.predictor_network.to(self.device)
-        self.target_network.to(self.device)
+        self.predictor.to(self.device)
+        self.target.to(self.device)
 
-        self.optimizer = optim.Adam(lr=self.lr, params=self.predictor_network.parameters())
+        self.opt = optim.Adam(lr=self.lr, params=self.predictor.parameters())
 
         # freeze the network parameters
-        for p in self.target_network.parameters():
+        for p in self.target.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, buffer, time_steps):
+    def compute_irs(self, batch_obs, time_steps):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param buffer: The experiences buffer.
+        :param batch_obs: The mini-batch of observations.
         :param time_steps: The current time steps.
         :return: The intrinsic rewards
         """
 
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        intrinsic_rewards = np.zeros_like(buffer.rewards)
+        n_steps = batch_obs.shape[0]
+        n_envs = batch_obs.shape[1]
+        intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
+
         # observations shape ((n_steps, n_envs) + obs_shape)
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations)
-        obs = obs.to(self.device)
+        obs_tensor = torch.from_numpy(batch_obs)
+        obs_tensor = obs_tensor.to(self.device)
 
         with torch.no_grad():
             for idx in range(n_envs):
-                encoded_obs = self.predictor_network(obs[:, idx])
-                encoded_obs_target = self.target_network(obs[:, idx])
-                dist = torch.norm(encoded_obs - encoded_obs_target, p=2, dim=1)
-                dist = (dist - dist.min()) / (dist.max() - dist.min() + 1e-6)
+                src_feats = self.predictor(obs_tensor[:, idx])
+                tgt_feats = self.target(obs_tensor[:, idx])
+                dist = F.mse_loss(src_feats, tgt_feats, reduction='none').mean(dim=1)
+                dist = (dist - dist.min()) / (dist.max() - dist.min() + 1e-11)
+                intrinsic_rewards[:-1, idx, 0] = dist[1:].cpu().numpy()
 
-                intrinsic_rewards[:-1, idx] = dist.cpu().numpy()[1:]
-
-        self.update(buffer)
+        self.update(obs_tensor)
 
         return beta_t * intrinsic_rewards
 
-    def update(self, buffer):
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations).reshape(n_steps * n_envs, *self.ob_shape)
-        obs = obs.to(self.device)
+    def update(self, batch_obs):
+        n_steps = batch_obs.size()[0]
+        n_envs = batch_obs.size()[1]
+        obs = batch_obs.reshape(n_steps * n_envs, *batch_obs.size()[2:])
 
         dataset = TensorDataset(obs)
         loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
 
         for idx, batch_data in enumerate(loader):
             batch_obs = batch_data[0]
-            encoded_obs = self.predictor_network(batch_obs)
-            encoded_obs_target = self.target_network(batch_obs)
+            src_feats = self.predictor(batch_obs)
+            tgt_feats = self.target(batch_obs)
 
-            loss = F.mse_loss(encoded_obs, encoded_obs_target)
-            self.optimizer.zero_grad()
+            loss = F.mse_loss(src_feats, tgt_feats)
+            self.opt.zero_grad()
             loss.backward()
-            self.optimizer.step()
+            self.opt.step()

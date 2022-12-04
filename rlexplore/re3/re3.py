@@ -70,16 +70,17 @@ class RE3(object):
         obs_tensor = torch.from_numpy(batch_obs)
         obs_tensor = obs_tensor.to(self.device)
 
-        for idx in range(n_envs):
-            src_feats = self.encoder(obs_tensor[:, idx])
-            dist = torch.linalg.vector_norm(src_feats.unsqueeze(1) - src_feats, ord=2, dim=2)
-            if average_entropy:
-                for sub_k in range(k):
-                    intrinsic_rewards[:, idx, 0] += torch.log(
-                        torch.kthvalue(dist, sub_k + 1, dim=1).values + 1.).cpu().numpy()
-                intrinsic_rewards[:, idx, 0] /= k
-            else:
-                intrinsic_rewards[:, idx, 0] = torch.log(
-                        torch.kthvalue(dist, k + 1, dim=1).values + 1.).cpu().numpy()
+        with torch.no_grad():
+            for idx in range(n_envs):
+                src_feats = self.encoder(obs_tensor[:, idx])
+                dist = torch.linalg.vector_norm(src_feats.unsqueeze(1) - src_feats, ord=2, dim=2)
+                if average_entropy:
+                    for sub_k in range(k):
+                        intrinsic_rewards[:, idx, 0] += torch.log(
+                            torch.kthvalue(dist, sub_k + 1, dim=1).values + 1.).cpu().numpy()
+                    intrinsic_rewards[:, idx, 0] /= k
+                else:
+                    intrinsic_rewards[:, idx, 0] = torch.log(
+                            torch.kthvalue(dist, k + 1, dim=1).values + 1.).cpu().numpy()
         
         return beta_t * intrinsic_rewards

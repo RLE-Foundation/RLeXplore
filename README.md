@@ -83,6 +83,9 @@ if __name__ == '__main__':
 | RISE      | Computation-efficient exploration  | 2022 | [Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9802917/) | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rise) |
 
 # Changelog
+**04/12/2022**
+- Update RND and RIDE.
+
 **03/12/2022**
 - We start to reconstruct the project to make it compatible with arbitrary tasks;
 - Update RE3 and RISE.
@@ -90,7 +93,6 @@ if __name__ == '__main__':
 **27/09/2022**
 - Update the RISE;
 - Introduce JAX in RISE. See ```experimental``` folder.
-
 
 **26/09/2022**
 - Update the RE3;

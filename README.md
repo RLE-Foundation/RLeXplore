@@ -33,13 +33,13 @@ Due to the large differences in the calculation of different intrinsic reward me
 1. In RLeXplore, the environments are assumed to be ***vectorized***;
 2. The ***compute_irs*** function of each intrinsic reward module has a mandatory argument ***rollouts***, which is a dict like:
 ```diff
-observations (n_steps, n_envs, *obs_shape) <class 'numpy.ndarray'>
-actions (n_steps, n_envs, action_shape) <class 'numpy.ndarray'>
-rewards (n_steps, n_envs, 1) <class 'numpy.ndarray'>
++ observations (n_steps, n_envs, *obs_shape) <class 'numpy.ndarray'>
+- actions (n_steps, n_envs, action_shape) <class 'numpy.ndarray'>
++ rewards (n_steps, n_envs, 1) <class 'numpy.ndarray'>
 ```
 
 Take RE3 for instance, it computes the intrinsic reward for each state based on the Euclidean distance between the state and 
-its $k$-nearest neighbor within a mini-batch. Thus it suffices to provide ***observations*** data to compute the reward. The following code provides a usage example of RE3:
+its $k$-nearest neighbor within a mini-batch. Thus it suffices to provide ***observations</font>*** data to compute the reward. The following code provides a usage example of RE3:
 ```python
 import torch
 import numpy as np

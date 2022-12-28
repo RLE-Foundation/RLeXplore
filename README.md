@@ -69,6 +69,11 @@ if __name__ == '__main__':
 # Output: (256, 16, 1) <class 'numpy.ndarray'>
 ```
 
+Train with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3) on PyBullet games:
+```shell
+python examples/ppo_re3_bullet.py --action-space cont --env-id AntBulletEnv-v0 --algo ppo --n-envs 10 --exploration re3 --total-time-steps 2000000 --n-steps 128
+```
+
 # Implemented Algorithms
 | Algorithm | Remark                                  | Year  | Paper                                                                                                                                                                                                                                                                      | Code                                                                                    |
 |:----------|:----------------------------------------|:------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|

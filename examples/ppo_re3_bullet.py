@@ -51,7 +51,7 @@ if __name__ == '__main__':
     envs = create_env(env_id=args.env_id, n_envs=args.n_envs, log_dir=log_dir)
     # Create RE3 module.
     if args.exploration == 're3':
-        re3 = RE3(envs=envs, device=device, latent_dim=128, beta=1e-2, kappa=1e-5)
+        re3 = RE3(obs_shape=envs.observation_space.shape, action_shape=envs.action_space.shape, device=device, latent_dim=128, beta=1e-2, kappa=1e-5)
     # Create PPO agent.
     model = PPO(policy='MlpPolicy', env=envs, n_steps=args.n_steps)
     # Set info buffer
@@ -71,10 +71,10 @@ if __name__ == '__main__':
         # Compute intrinsic rewards.
         if args.exploration == 're3':
             intrinsic_rewards = re3.compute_irs(
-                buffer=model.rollout_buffer,
+                rollouts={'observations': model.rollout_buffer.observations},
                 time_steps=i * args.n_steps * args.n_envs,
                 k=3)
-            model.rollout_buffer.rewards += intrinsic_rewards
+            model.rollout_buffer.rewards += intrinsic_rewards[:, :, 0]
         # Update policy using the currently gathered rollout buffer.
         model.train()
         t_e = time.perf_counter()

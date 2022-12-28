@@ -7,7 +7,8 @@
 
 # Reinforcement Learning Exploration Baselines (RLeXplore)
 
-RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. 
+RLeXplore is a set of implementations of exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. In particular, RLeXplore is
+designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks. 
 
 <div align=center>
 <img src='./docs/flowchart.png' style="width: 600px">
@@ -27,14 +28,17 @@ pip install -r requirements.txt
 ```
 
 # Usage Example
-In RLeXplore, the environments are assumed to be vectorized and the data shape of observations are ![](https://latex.codecogs.com/svg.image?(N_{steps},N_{envs},Obs\\:shape)). Take RE3 for instance, it computes the intrinsic reward for each transition by
+Due to the large differences in the calculation of different intrinsic reward methods, RLeXplore has the following rules:
 
-<div align=center>
-<img src='https://latex.codecogs.com/svg.image?I_{t}=\log(\Vert\boldsymbol{y}_{t}-\tilde{\boldsymbol{y}}_{t}\Vert_{2}&plus;1)'>
-</div>
+1. In RLeXplore, the environments are assumed to be *<font color=#ff5400>vectorized</font>*;
+2. The *<font color=#06d6a0>compute_irs</font>* function of each intrinsic reward module has a mandatory argument *rollouts*, which is a dict like:
+   - *<font color=#3a86ff>observations</font>* (n_steps, n_envs, *obs_shape) <class 'numpy.ndarray'>
+   - *<font color=#8338ec>actions</font>* (n_steps, n_envs, action_shape) <class 'numpy.ndarray'>
+   - *<font color=#ff006e>rewards</font>* (n_steps, n_envs, 1) <class 'numpy.ndarray'>
 
-where ![](https://latex.codecogs.com/svg.image?\boldsymbol{y}_{t}=f_{\boldsymbol{\theta}}(\boldsymbol{s}_t)) is a fixed representation from a random encoder and ![](https://latex.codecogs.com/svg.image?\tilde{\boldsymbol{y}}_{t}) is the ![](https://latex.codecogs.com/svg.image?k)-nearest
-neighbor of ![](https://latex.codecogs.com/svg.image?\tilde{\boldsymbol{y}}_{t}) within a set of ![](https://latex.codecogs.com/svg.image?N) representations ![](https://latex.codecogs.com/svg.image?\\{\boldsymbol{y}_{1},\boldsymbol{y}_{2},\dots,\boldsymbol{y}_{N}\\}). The following code provides a usage example of RE3:
+
+Take RE3 for instance, it computes the intrinsic reward for each state based on the Euclidean distance between the state and 
+its $k$-nearest neighbor within a mini-batch. Thus it suffices to provide *<font color=#3a86ff>observations</font>* data to compute the reward. The following code provides a usage example of RE3:
 ```python
 import torch
 import numpy as np
@@ -44,26 +48,19 @@ if __name__ == '__main__':
     ''' env setup '''
     device = torch.device('cuda:0')
     obs_shape = (4, 84, 84)
-    action_shape = 7
+    action_shape = 1 # for discrete action space
     n_envs = 16 
     n_steps = 256 
-    batch_obs = np.random.randn(n_steps, n_envs, *obs_shape).astype('float32')
+    observations = np.random.randn(
+       n_steps, n_envs, *obs_shape).astype('float32') # collected experiences 
 
     ''' create RE3 instance '''
-    re3 = RE3(
-        obs_shape=obs_shape, 
-        action_shape=action_shape, 
-        device=device,
-        latent_dim=128,
-        beta=0.05,
-        kappa=0.00001)
+    re3 = RE3(obs_shape=obs_shape, action_shape=action_shape, device=device,
+              latent_dim=128, beta=0.05, kappa=0.00001)
 
     ''' compute intrinsic rewards '''
-    intrinsic_rewards = re3.compute_irs(
-        batch_obs=batch_obs,
-        time_steps=25600,
-        k=3,
-        average_entropy=True)
+    intrinsic_rewards = re3.compute_irs(rollouts={'observations': observations},
+        time_steps=25600, k=3, average_entropy=False)
 
     print(intrinsic_rewards.shape, type(intrinsic_rewards))
     print(intrinsic_rewards)
@@ -72,17 +69,22 @@ if __name__ == '__main__':
 ```
 
 # Implemented Algorithms
-| Algorithm | Remark                             | Year | Paper                                                                                                                                             | Code                                                                                    |
-|:----------|:-----------------------------------|:-----|:--------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
-| ICM       | Count-based exploration       | 2017 | [Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)                            | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/icm)  |
-| RND       | Curiosity-driven exploration          | 2019 | [Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf)                                                                | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rnd)  |
-| GIRM      | Curiosity-driven exploration       | 2020 | [Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)                              | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/girm) |
-| NGU       | Memory-based exploration           | 2020 | [Never Give Up: Learning Directed Exploration Strategies](https://arxiv.org/pdf/2002.06038)                                                       | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ngu)  |
-| RIDE      | Procedurally-generated environment | 2020 | [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)                             | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ride) |
-| RE3       | Computation-efficient exploration  | 2021 | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf)                  | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/re3)  |
-| RISE      | Computation-efficient exploration  | 2022 | [Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9802917/) | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rise) |
+| Algorithm | Remark                                  | Year  | Paper                                                                                                                                                                                                                                                                      | Code                                                                                    |
+|:----------|:----------------------------------------|:------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| ICM       | Count-based exploration                 | 2017  | [Curiosity-Driven Exploration by Self-Supervised Prediction](http://proceedings.mlr.press/v70/pathak17a/pathak17a.pdf)                                                                                                                                                     | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/icm)  |
+| RND       | Curiosity-driven exploration            | 2019  | [Exploration by Random Network Distillation](https://arxiv.org/pdf/1810.12894.pdf)                                                                                                                                                                                         | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rnd)  |
+| GIRM      | Curiosity-driven exploration            | 2020  | [Intrinsic Reward Driven Imitation Learning via Generative Model](http://proceedings.mlr.press/v119/yu20d/yu20d.pdf)                                                                                                                                                       | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/girm) |
+| NGU       | Memory-based exploration                | 2020  | [Never Give Up: Learning Directed Exploration Strategies](https://arxiv.org/pdf/2002.06038)                                                                                                                                                                                | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ngu)  |
+| RIDE      | Procedurally-generated environment      | 2020  | [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://arxiv.org/pdf/2002.12292)                                                                                                                                                      | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/ride) |
+| RE3       | Shannon Entropy Maximization            | 2021  | [State Entropy Maximization with Random Encoders for Efficient Exploration](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf)                                                                                                                                           | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/re3)  |
+| RISE      | Rényi Entropy Maximization              | 2022  | [Rényi State Entropy Maximization for Exploration Acceleration in Reinforcement Learning](https://ieeexplore.ieee.org/abstract/document/9802917/)                                                                                                                          | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/rise) |
+| REVD      | Rényi Divergence Maximization           | 2022  | [Rewarding Episodic Visitation Discrepancy for Exploration in Reinforcement Learning](https://openreview.net/pdf?id=V2pw1VYMrDo)                                                                                                                                           | [Link](https://github.com/yuanmingqi/rl-exploration-baselines/tree/main/rlexplore/revd) |
 
 # Changelog
+**28/12/2022**
+- Update RE3, RISE, RND, RIDE.
+- Add a new method entitled REVD.
+
 **04/12/2022**
 - Update RND and RIDE.
 

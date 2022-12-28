@@ -63,22 +63,22 @@ class RND(object):
         for p in self.target.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, batch_obs, time_steps):
+    def compute_irs(self, rollouts, time_steps):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param batch_obs: The mini-batch of observations.
+        :param rollouts: The collected experiences.
         :param time_steps: The current time steps.
         :return: The intrinsic rewards
         """
 
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        n_steps = batch_obs.shape[0]
-        n_envs = batch_obs.shape[1]
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
         intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
 
         # observations shape ((n_steps, n_envs) + obs_shape)
-        obs_tensor = torch.from_numpy(batch_obs)
+        obs_tensor = torch.from_numpy(rollouts['observations'])
         obs_tensor = obs_tensor.to(self.device)
 
         with torch.no_grad():
@@ -89,15 +89,12 @@ class RND(object):
                 dist = (dist - dist.min()) / (dist.max() - dist.min() + 1e-11)
                 intrinsic_rewards[:-1, idx, 0] = dist[1:].cpu().numpy()
 
-        self.update(obs_tensor)
+        # update the predictor network
+        self.update(torch.clone(obs_tensor).reshape(n_steps*n_envs, *obs_tensor.size()[2:]))
 
         return beta_t * intrinsic_rewards
 
-    def update(self, batch_obs):
-        n_steps = batch_obs.size()[0]
-        n_envs = batch_obs.size()[1]
-        obs = batch_obs.reshape(n_steps * n_envs, *batch_obs.size()[2:])
-
+    def update(self, obs):
         dataset = TensorDataset(obs)
         loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
 

@@ -75,20 +75,20 @@ class RIDE:
         return counts
     
     
-    def compute_irs(self, batch_obs, time_steps):
+    def compute_irs(self, rollouts, time_steps):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param batch_obs: The mini-batch of observations.
+        :param rollouts: The collected experiences.
         :param time_steps: The current time steps.
         :return: The intrinsic rewards
         """
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        n_steps = batch_obs.shape[0]
-        n_envs = batch_obs.shape[1]
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
         intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
 
         # observations shape ((n_steps, n_envs) + obs_shape)
-        obs_tensor = torch.from_numpy(batch_obs)
+        obs_tensor = torch.from_numpy(rollouts['observations'])
         obs_tensor = obs_tensor.to(self.device)
 
         with torch.no_grad():

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="fc965e15-f128-4497-bc5a-f53a0e549f38" name="HKPU-WS-3090">
+        <fileTransfer rootFolder="/export/yuanmingqi/code" accessType="SFTP" host="158.132.10.126" port="22" sshConfigId="6373ee0f-950b-42b5-8fc7-8df09a6bb4a2" sshConfig="yuanmingqi@158.132.10.126:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

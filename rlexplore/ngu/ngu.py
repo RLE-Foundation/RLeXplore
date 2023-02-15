@@ -1,13 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-'''
-@Project ：rl-exploration-baselines 
-@File ：ngu.py
-@Author ：YUAN Mingqi
-@Date ：2022/9/21 19:33 
-'''
-
-from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
+from src.networks.random_encoder import CnnEncoder, MlpEncoder
 from torch import optim
 from torch.nn import functional as F
 from torch.utils.data import TensorDataset, DataLoader
@@ -80,21 +71,21 @@ class NGU(object):
         for p in self.embedding_network.parameters():
             p.requires_grad = False
 
-    def compute_irs(self, buffer, time_steps):
+    def compute_irs(self, rollouts, time_steps):
         """
         Compute the intrinsic rewards using the collected observations.
-        :param buffer: The experiences buffer.
+        :param rollouts: The collected experiences.
         :param time_steps: The current time steps.
         :return: The intrinsic rewards
         """
 
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        intrinsic_rewards = np.zeros_like(buffer.rewards)
-        # observations shape ((n_steps, n_envs) + obs_shape)
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations)
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
+        intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
+
+        obs = torch.from_numpy(rollouts['observations'])
         obs = obs.to(self.device)
 
         with torch.no_grad():
@@ -118,14 +109,14 @@ class NGU(object):
                 intrinsic_rewards[:-1, idx] = episodic_rewards[:-1] * life_long_rewards
 
         # update the rnd module
-        self.update(buffer)
+        self.update(rollouts)
 
         return beta_t * intrinsic_rewards
 
-    def update(self, buffer):
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations).reshape(n_steps * n_envs, *self.ob_shape)
+    def update(self, rollouts):
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
+        obs = torch.from_numpy(rollouts['observations']).reshape(n_steps * n_envs, *self.ob_shape)
         obs = obs.to(self.device)
 
         dataset = TensorDataset(obs)

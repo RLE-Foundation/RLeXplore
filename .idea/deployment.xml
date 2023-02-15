@@ -2,14 +2,7 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="CUHK YUAN">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="yuanmingqi@10.31.36.207:22 password">
+      <paths name="HKPU-WS-3090">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

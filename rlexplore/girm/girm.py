@@ -1,14 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-'''
-@Project ：rl-exploration-baselines 
-@File ：girm.py
-@Author ：YUAN Mingqi
-@Date ：2022/9/21 14:16 
-'''
-
-from rlexplore.networks.girm_vae_encoder_decoder import CnnEncoder, CnnDecoder, MlpEncoder, MlpDecoder
-from rlexplore.utils.state_process import process
+from src.networks.girm_vae_encoder_decoder import CnnEncoder, CnnDecoder, MlpEncoder, MlpDecoder
+from src.utils.state_process import process
 
 from torch import nn
 from torch.autograd import Variable
@@ -144,16 +135,22 @@ class GIRM(object):
 
         return RECON, KLD
 
-    def compute_irs(self, buffer, time_steps):
+    def compute_irs(self, rollouts, time_steps):
+        """
+        Compute the intrinsic rewards using the collected observations.
+        :param rollouts: The collected experiences.
+        :param time_steps: The current time steps.
+        :return: The intrinsic rewards
+        """
+
         # compute the weighting coefficient of timestep t
         beta_t = self.beta * np.power(1. - self.kappa, time_steps)
-        intrinsic_rewards = np.zeros_like(buffer.rewards)
-        # observations shape ((n_steps, n_envs) + obs_shape)
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
+        intrinsic_rewards = np.zeros(shape=(n_steps, n_envs, 1))
 
-        obs = torch.from_numpy(buffer.observations)
-        actions = torch.from_numpy(buffer.actions)
+        obs = torch.from_numpy(rollouts['observations'])
+        actions = torch.from_numpy(rollouts['actions'])
         obs = obs.to(self.device)
         if self.action_type == 'dis':
             # actions size: (n_steps, n_envs, 1)
@@ -190,19 +187,19 @@ class GIRM(object):
                                                          reduction='mean').cpu().numpy()
 
         # train the vae model
-        self.update(buffer)
+        self.update(rollouts)
 
         return beta_t * intrinsic_rewards
 
-    def update(self, buffer, lambda_recon=1.0, lambda_action=1.0, kld_loss_beta=1.0, lambda_gp=0.0):
-        n_steps = buffer.observations.shape[0]
-        n_envs = buffer.observations.shape[1]
-        obs = torch.from_numpy(buffer.observations).reshape(n_steps * n_envs, *self.ob_shape)
+    def update(self, rollouts, lambda_recon=1.0, lambda_action=1.0, kld_loss_beta=1.0, lambda_gp=0.0):
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
+        obs = torch.from_numpy(rollouts['observations']).reshape(n_steps * n_envs, *self.ob_shape)
         if self.action_type == 'dis':
-            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, )
+            actions = torch.from_numpy(rollouts['actions']).reshape(n_steps * n_envs, )
             actions = F.one_hot(actions.to(torch.int64), self.action_shape).float()
         else:
-            actions = torch.from_numpy(buffer.actions).reshape(n_steps * n_envs, self.action_shape[0])
+            actions = torch.from_numpy(rollouts['actions']).reshape(n_steps * n_envs, self.action_shape[0])
         obs = obs.to(self.device)
         actions = actions.to(self.device)
         # create data loader

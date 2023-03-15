@@ -1,4 +1,4 @@
-from src.networks.random_encoder import CnnEncoder, MlpEncoder
+from rlexplore.networks.random_encoder import CnnEncoder, MlpEncoder
 from torch import optim
 from torch.nn import functional as F
 from torch.utils.data import TensorDataset, DataLoader

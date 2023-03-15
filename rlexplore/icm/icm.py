@@ -1,4 +1,4 @@
-from src.networks.inverse_forward_networks import InverseForwardDynamicsModel, CnnEncoder
+from rlexplore.networks.inverse_forward_networks import InverseForwardDynamicsModel, CnnEncoder
 
 from torch import nn, optim
 from torch.nn import functional as F

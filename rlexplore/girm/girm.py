@@ -1,5 +1,5 @@
-from src.networks.girm_vae_encoder_decoder import CnnEncoder, CnnDecoder, MlpEncoder, MlpDecoder
-from src.utils.state_process import process
+from rlexplore.networks.girm_vae_encoder_decoder import CnnEncoder, CnnDecoder, MlpEncoder, MlpDecoder
+from rlexplore.utils.state_process import process
 
 from torch import nn
 from torch.autograd import Variable

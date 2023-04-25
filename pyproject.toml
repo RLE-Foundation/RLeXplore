@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rlexplore"
+version = "0.0.1"
+authors = [{name = "Yuan Mingqi"}]
+license = {text = "MIT"}
+description = "rl-exploration-baselines"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+urls = {Homepage = "TODO"}
+dependencies = [
+"stable-baselines3",
+]
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+namespaces = false
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
+include = '''
+    .*rlexplore/.*\.pyi?$
+    | .*scripts/.*\.pyi?$
+    | .*tests/.*\.pyi?$
+'''
+

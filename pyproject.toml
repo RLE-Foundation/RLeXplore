@@ -29,13 +29,3 @@ include-package-data = false
 [tool.setuptools.packages.find]
 exclude = ["tests"]
 namespaces = false
-
-[tool.black]
-line-length = 120
-target-version = ['py38']
-include = '''
-    .*rlexplore/.*\.pyi?$
-    | .*scripts/.*\.pyi?$
-    | .*tests/.*\.pyi?$
-'''
-

@@ -15,7 +15,7 @@ designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-R
 </div>
 
 # Notice
-This repo has been merged with a new project: [https://github.com/RLE-Foundation/Hsuanwu](https://github.com/RLE-Foundation/Hsuanwu), in which more reasonable implementations are provided!
+**This repo has been merged with a new project: [https://github.com/RLE-Foundation/Hsuanwu](https://github.com/RLE-Foundation/Hsuanwu), in which more reasonable implementations are provided!**
 
 Invoke the intrinsic reward module by:
 ``` python

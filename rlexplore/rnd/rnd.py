@@ -16,8 +16,7 @@ import numpy as np
 
 class RND(object):
     def __init__(self,
-                 obs_shape,
-                 action_shape,
+                 envs,
                  device,
                  latent_dim,
                  lr,
@@ -29,8 +28,7 @@ class RND(object):
         Exploration by Random Network Distillation (RND)
         Paper: https://arxiv.org/pdf/1810.12894.pdf
 
-        :param obs_shape: The data shape of observations.
-        :param action_shape: The data shape of actions.
+        :param envs: The environment to learn from.
         :param device: Device (cpu, cuda, ...) on which the code should be run.
         :param latent_dim: The dimension of encoding vectors of the observations.
         :param lr: The learning rate of predictor network.
@@ -39,8 +37,8 @@ class RND(object):
         :param kappa: The decay rate.
         """
 
-        self.obs_shape = obs_shape
-        self.action_shape = action_shape
+        self.obs_shape = envs.observation_space.shape
+        self.action_shape = envs.action_space.shape
         self.device = device
         self.lr = lr
         self.batch_size = batch_size
@@ -48,11 +46,11 @@ class RND(object):
         self.kappa = kappa
 
         if len(self.obs_shape) == 3:
-            self.predictor = CnnEncoder(obs_shape, latent_dim)
-            self.target = CnnEncoder(obs_shape, latent_dim)
+            self.predictor = CnnEncoder(self.obs_shape, latent_dim)
+            self.target = CnnEncoder(self.obs_shape, latent_dim)
         else:
-            self.predictor = MlpEncoder(obs_shape, latent_dim)
-            self.target = MlpEncoder(obs_shape, latent_dim)
+            self.predictor = MlpEncoder(self.obs_shape, latent_dim)
+            self.target = MlpEncoder(self.obs_shape, latent_dim)
 
         self.predictor.to(self.device)
         self.target.to(self.device)
@@ -89,12 +87,17 @@ class RND(object):
                 dist = (dist - dist.min()) / (dist.max() - dist.min() + 1e-11)
                 intrinsic_rewards[:-1, idx, 0] = dist[1:].cpu().numpy()
 
-        # update the predictor network
-        self.update(torch.clone(obs_tensor).reshape(n_steps*n_envs, *obs_tensor.size()[2:]))
-
         return beta_t * intrinsic_rewards
 
-    def update(self, obs):
+    def update(self, rollouts):
+        obs_tensor = torch.from_numpy(rollouts['observations'])
+        obs_tensor = obs_tensor.to(self.device)
+        n_steps = rollouts['observations'].shape[0]
+        n_envs = rollouts['observations'].shape[1]
+        # update the predictor network
+        return self._update(torch.clone(obs_tensor).reshape(n_steps*n_envs, *obs_tensor.size()[2:]))
+
+    def _update(self, obs):
         dataset = TensorDataset(obs)
         loader = DataLoader(dataset=dataset, batch_size=self.batch_size, drop_last=True)
 

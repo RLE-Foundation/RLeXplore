@@ -15,11 +15,11 @@ designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-R
 </div>
 
 # Notice
-**This repo has been merged with a new project: [https://github.com/RLE-Foundation/Hsuanwu](https://github.com/RLE-Foundation/Hsuanwu), in which more reasonable implementations are provided!**
+**This repo has been merged with a new project: [https://github.com/RLE-Foundation/rllte](https://github.com/RLE-Foundation/rllte), in which more reasonable implementations are provided!**
 
 Invoke the intrinsic reward module by:
 ``` python
-from hsuanwu.xplore.reward import ICM, RIDE, ...
+from rllte.xplore.reward import ICM, RIDE, ...
 ```
 
 ## Module List
@@ -40,20 +40,20 @@ from hsuanwu.xplore.reward import ICM, RIDE, ...
 > - `Visual`: The method works well in visual RL.
 
 # Example
-Due to the large differences in the calculation of different intrinsic reward methods, Hsuanwu has the following rules:
+Due to the large differences in the calculation of different intrinsic reward methods, **rllte** has the following rules:
 
 1. The environments are assumed to be ***vectorized***;
 2. The ***compute_irs*** function of each intrinsic reward module has a mandatory argument ***samples***, which is a dict like:
      - obs (n_steps, n_envs, *obs_shape) <class 'torch.Tensor'>
-     - actions (n_steps, n_envs, action_shape) <class 'torch.Tensor'>
+     - actions (n_steps, n_envs, *action_shape) <class 'torch.Tensor'>
      - rewards (n_steps, n_envs) <class 'torch.Tensor'>
      - next_obs (n_steps, n_envs, *obs_shape) <class 'torch.Tensor'>
 
 Take RE3 for instance, it computes the intrinsic reward for each state based on the Euclidean distance between the state and 
 its $k$-nearest neighbor within a mini-batch. Thus it suffices to provide ***obs*** data to compute the reward. The following code provides a usage example of RE3:
 ``` py title="example.py"
-from hsuanwu.xplore.reward import RE3
-from hsuanwu.env import make_dmc_env
+from rllte.xplore.reward import RE3
+from rllte.env import make_dmc_env
 import torch as th
 
 if __name__ == '__main__':

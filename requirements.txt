@@ -4,9 +4,6 @@ ale-py==0.7.5
 asttokens==2.0.8
 attrs==22.1.0
 backcall==0.2.0
-certifi @ file:///opt/conda/conda-bld/certifi_1655968806487/work/certifi
-cffi==1.15.1
-charset-normalizer==2.1.1
 click==8.0.4
 cloudpickle==2.1.0
 cycler==0.11.0

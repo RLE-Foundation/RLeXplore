@@ -15,6 +15,8 @@ designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-R
 </div>
 
 # Notice
+**We will publish a big update recently. You can check this branch https://github.com/RLE-Foundation/rllte/blob/reward/ for the lastest code and there are examples https://github.com/RLE-Foundation/rllte/blob/reward/experimental/ for using RLeXplore with SB3 and CleanRL.**
+
 **This repo has been merged with a new project: [https://github.com/RLE-Foundation/rllte](https://github.com/RLE-Foundation/rllte), in which more reasonable implementations are provided!**
 
 Invoke the intrinsic reward module by:
@@ -22,7 +24,7 @@ Invoke the intrinsic reward module by:
 from rllte.xplore.reward import ICM, RIDE, ...
 ```
 
-## Module List
+## Module List (See the notice)
 | Module | Remark | Repr.  | Visual | Reference | 
 |:-|:-|:-|:-|:-|
 | PseudoCounts | Count-Based exploration |✔️|✔️|[Never Give Up: Learning Directed Exploration Strategies](https://arxiv.org/pdf/2002.06038) |
@@ -39,7 +41,7 @@ from rllte.xplore.reward import ICM, RIDE, ...
 > - `Repr.`: The method involves representation learning.
 > - `Visual`: The method works well in visual RL.
 
-# Example
+# Example (See the notice)
 Due to the large differences in the calculation of different intrinsic reward methods, **rllte** has the following rules:
 
 1. The environments are assumed to be ***vectorized***;

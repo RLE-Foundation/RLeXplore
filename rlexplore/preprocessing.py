@@ -61,10 +61,14 @@ def process_observation_space(observation_space: gym.Space) -> ObsShape:
             for (key, subspace) in observation_space.spaces.items()
         }
     else:
-        raise NotImplementedError(f"{observation_space} observation space is not supported")
+        raise NotImplementedError(
+            f"{observation_space} observation space is not supported"
+        )
 
 
-def process_action_space(action_space: gym.Space) -> Tuple[Tuple[int, ...], int, int, str]:
+def process_action_space(
+    action_space: gym.Space,
+) -> Tuple[Tuple[int, ...], int, int, str]:
     """Get the dimension of the action space.
 
     Args:
@@ -134,11 +138,17 @@ def is_image_space_channels_first(observation_space: spaces.Box) -> bool:
     """
     smallest_dimension = np.argmin(observation_space.shape).item()
     if smallest_dimension == 1:
-        warnings.warn("Treating image space as channels-last, while second dimension was smallest of the three.")
+        warnings.warn(
+            "Treating image space as channels-last, while second dimension was smallest of the three."
+        )
     return smallest_dimension == 0
 
 
-def is_image_space(observation_space: gym.Space, check_channels: bool = False, normalized_image: bool = False) -> bool:
+def is_image_space(
+    observation_space: gym.Space,
+    check_channels: bool = False,
+    normalized_image: bool = False,
+) -> bool:
     """
     Check if a observation space has the shape, limits and dtype of a valid image.
     The check is conservative, so that it returns False if there is a doubt.
@@ -165,7 +175,9 @@ def is_image_space(observation_space: gym.Space, check_channels: bool = False, n
             return False
 
         # Check the value range
-        incorrect_bounds = np.any(observation_space.low != 0) or np.any(observation_space.high != 255)
+        incorrect_bounds = np.any(observation_space.low != 0) or np.any(
+            observation_space.high != 255
+        )
         if check_bounds and incorrect_bounds:
             return False
 
@@ -182,7 +194,9 @@ def is_image_space(observation_space: gym.Space, check_channels: bool = False, n
     return False
 
 
-def preprocess_obs(obs: th.Tensor, observation_space: gym.Space) -> Union[th.Tensor, Dict[str, th.Tensor]]:
+def preprocess_obs(
+    obs: th.Tensor, observation_space: gym.Space
+) -> Union[th.Tensor, Dict[str, th.Tensor]]:
     """Observations preprocessing function.
         Borrowed from: https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/preprocessing.py#L92
 
@@ -206,7 +220,9 @@ def preprocess_obs(obs: th.Tensor, observation_space: gym.Space) -> Union[th.Ten
         # Tensor concatenation of one hot encodings of each Categorical sub-space
         return th.cat(
             [
-                F.one_hot(obs_.long(), num_classes=int(observation_space.nvec[idx])).float()
+                F.one_hot(
+                    obs_.long(), num_classes=int(observation_space.nvec[idx])
+                ).float()
                 for idx, obs_ in enumerate(th.split(obs.long(), 1, dim=1))
             ],
             dim=-1,
@@ -224,4 +240,6 @@ def preprocess_obs(obs: th.Tensor, observation_space: gym.Space) -> Union[th.Ten
         return preprocessed_obs
 
     else:
-        raise NotImplementedError(f"Preprocessing not implemented for {observation_space}")
+        raise NotImplementedError(
+            f"Preprocessing not implemented for {observation_space}"
+        )

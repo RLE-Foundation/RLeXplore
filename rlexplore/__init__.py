@@ -23,4 +23,13 @@
 # =============================================================================
 
 
-from .base_reward import BaseReward
+from .base_reward import BaseReward as BaseReward
+from .disagreement import Disagreement as Disagreement
+from .e3b import E3B as E3B
+from .fabric import Fabric as Fabric
+from .icm import ICM as ICM
+from .ngu import NGU as NGU
+from .pseudo_counts import PseudoCounts as PseudoCounts
+from .re3 import RE3 as RE3
+from .ride import RIDE as RIDE
+from .rnd import RND as RND

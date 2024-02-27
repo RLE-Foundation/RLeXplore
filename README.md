@@ -1,11 +1,10 @@
 <div align=center>
-<img src='./docs/logo.jpg'>
-</div>
+<br>
+<img src='./docs/logo.png' style="width: 85%">
+<br>
 
-<img src="https://img.shields.io/badge/Python->=3.8-brightgreen"> <img src="https://img.shields.io/badge/PyTorch->=1.8.1-orange"> <img src="https://img.shields.io/badge/Gym->=0.21.1-%23252422"> <img src="https://img.shields.io/badge/PyBullet-3.2.5-%2306d6a0">  <img src="https://img.shields.io/badge/DMC Suite-1.0.5-blue"> <img src="https://img.shields.io/badge/JAX-0.3.17-%238338ec"> <img src="https://img.shields.io/badge/Docs-Developing-%23ff595e"> 
 
-
-# Reinforcement Learning Exploration Baselines (RLeXplore)
+# RLeXplore: Benchmarking Intrinsic Reward Shaping in Reinforcement Learning
 
 RLeXplore is a set of implementations of intrinsic reward driven-exploration approaches in reinforcement learning using PyTorch, which can be deployed in arbitrary algorithms in a plug-and-play manner. In particular, RLeXplore is
 designed to be well compatible with [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3), providing more stable exploration benchmarks. 

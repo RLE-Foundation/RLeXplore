@@ -23,24 +23,27 @@
 # =============================================================================
 
 
+import math
 from typing import Tuple
+
+import numpy as np
+import torch as th
 from torch import nn
 
-import torch as th
-import numpy as np
-import math
 
 def orthogonal_layer_init(layer, std=np.sqrt(2), bias_const=0.0):
     th.nn.init.orthogonal_(layer.weight, std)
     th.nn.init.constant_(layer.bias, bias_const)
     return layer
 
+
 def default_layer_init(layer):
-    stdv = 1. / math.sqrt(layer.weight.size(1))
+    stdv = 1.0 / math.sqrt(layer.weight.size(1))
     layer.weight.data.uniform_(-stdv, stdv)
     if layer.bias is not None:
         layer.bias.data.uniform_(-stdv, stdv)
     return layer
+
 
 class ObservationEncoder(nn.Module):
     """Encoder for encoding observations.
@@ -55,11 +58,13 @@ class ObservationEncoder(nn.Module):
         Encoder instance.
     """
 
-    def __init__(self, 
-                 obs_shape: Tuple, 
-                 latent_dim: int, 
-                 encoder_model: str = "mnih", 
-                 weight_init: str = "default") -> None:
+    def __init__(
+        self,
+        obs_shape: Tuple,
+        latent_dim: int,
+        encoder_model: str = "mnih",
+        weight_init: str = "default",
+    ) -> None:
         super().__init__()
 
         if weight_init == "orthogonal":
@@ -69,9 +74,8 @@ class ObservationEncoder(nn.Module):
         else:
             raise ValueError("Invalid weight_init")
 
-
         # visual
-        if encoder_model == "mnih" and len(obs_shape) > 2:
+        if encoder_model == "Mnih" and len(obs_shape) > 2:
             self.trunk = nn.Sequential(
                 init_(nn.Conv2d(obs_shape[0], 32, 8, stride=4)),
                 nn.ReLU(),
@@ -88,7 +92,7 @@ class ObservationEncoder(nn.Module):
 
             self.trunk.append(init_(nn.Linear(n_flatten, latent_dim)))
             self.trunk.append(nn.ReLU())
-        elif encoder_model == "pathak" and len(obs_shape) > 2:
+        elif encoder_model == "Pathak" and len(obs_shape) > 2:
             self.trunk = nn.Sequential(
                 init_(nn.Conv2d(obs_shape[0], 32, kernel_size=3, stride=2, padding=1)),
                 nn.ELU(),
@@ -107,10 +111,7 @@ class ObservationEncoder(nn.Module):
             self.trunk.append(init_(nn.Linear(n_flatten, latent_dim)))
             self.trunk.append(nn.ReLU())
         else:
-            self.trunk = nn.Sequential(
-                init_(nn.Linear(obs_shape[0], 256)), 
-                nn.ReLU()
-            )
+            self.trunk = nn.Sequential(init_(nn.Linear(obs_shape[0], 256)), nn.ReLU())
             self.trunk.append(init_(nn.Linear(256, latent_dim)))
 
     def forward(self, obs: th.Tensor) -> th.Tensor:
@@ -124,7 +125,8 @@ class ObservationEncoder(nn.Module):
         """
         # normalization for intrinsic rewards is dealt with in the base intrinsic reward class
         return self.trunk(obs)
-    
+
+
 class InverseDynamicsEncoder(nn.Module):
     """Encoder with inverse dynamics prediction.
 
@@ -137,11 +139,22 @@ class InverseDynamicsEncoder(nn.Module):
         Encoder instance.
     """
 
-    def __init__(self, obs_shape: Tuple, action_dim: int, latent_dim: int, encoder_model:str="mnih", weight_init="default") -> None:
+    def __init__(
+        self,
+        obs_shape: Tuple,
+        action_dim: int,
+        latent_dim: int,
+        encoder_model: str = "mnih",
+        weight_init="default",
+    ) -> None:
         super().__init__()
 
-        self.encoder = ObservationEncoder(obs_shape, latent_dim, encoder_model=encoder_model, weight_init=weight_init)
-        self.policy = InverseDynamicsModel(latent_dim, action_dim, encoder_model=encoder_model, weight_init=weight_init)
+        self.encoder = ObservationEncoder(
+            obs_shape, latent_dim, encoder_model=encoder_model, weight_init=weight_init
+        )
+        self.policy = InverseDynamicsModel(
+            latent_dim, action_dim, encoder_model=encoder_model, weight_init=weight_init
+        )
 
     def forward(self, obs: th.Tensor, next_obs: th.Tensor) -> th.Tensor:
         """Forward function for outputing predicted actions.
@@ -169,7 +182,7 @@ class InverseDynamicsEncoder(nn.Module):
             Encoding tensors.
         """
         return self.encoder(obs)
-    
+
 
 class InverseDynamicsModel(nn.Module):
     """Inverse model for reconstructing transition process.
@@ -182,10 +195,17 @@ class InverseDynamicsModel(nn.Module):
         Model instance.
     """
 
-    def __init__(self, latent_dim, action_dim, encoder_model="mnih", weight_init="default") -> None:
+    def __init__(
+        self, latent_dim, action_dim, encoder_model="mnih", weight_init="default"
+    ) -> None:
         super().__init__()
 
-        self.trunk = ObservationEncoder(obs_shape=(latent_dim * 2,), latent_dim=action_dim, encoder_model=encoder_model, weight_init=weight_init)
+        self.trunk = ObservationEncoder(
+            obs_shape=(latent_dim * 2,),
+            latent_dim=action_dim,
+            encoder_model=encoder_model,
+            weight_init=weight_init,
+        )
 
     def forward(self, obs: th.Tensor, next_obs: th.Tensor) -> th.Tensor:
         """Forward function for outputing predicted actions.
@@ -199,6 +219,7 @@ class InverseDynamicsModel(nn.Module):
         """
         return self.trunk(th.cat([obs, next_obs], dim=1))
 
+
 class ForwardDynamicsModel(nn.Module):
     """Forward model for reconstructing transition process.
 
@@ -210,10 +231,17 @@ class ForwardDynamicsModel(nn.Module):
         Model instance.
     """
 
-    def __init__(self, latent_dim, action_dim, encoder_model="mnih", weight_init="default") -> None:
+    def __init__(
+        self, latent_dim, action_dim, encoder_model="mnih", weight_init="default"
+    ) -> None:
         super().__init__()
 
-        self.trunk = ObservationEncoder(obs_shape=(latent_dim + action_dim,), latent_dim=latent_dim, encoder_model=encoder_model, weight_init=weight_init)
+        self.trunk = ObservationEncoder(
+            obs_shape=(latent_dim + action_dim,),
+            latent_dim=latent_dim,
+            encoder_model=encoder_model,
+            weight_init=weight_init,
+        )
 
     def forward(self, obs: th.Tensor, pred_actions: th.Tensor) -> th.Tensor:
         """Forward function for outputing predicted next-obs.

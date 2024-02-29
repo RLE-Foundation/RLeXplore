@@ -51,8 +51,8 @@ See [Tutorials: Use Intrinsic Reward and Observation Augmentation](./tutorials/d
 ## Tutorials
 Click the following links to get the code notebook:
 
-0. [Quick Start]()
-1. [RLeXplore with RLLTE]()
+0. [Quick Start](./0%20quick_start.ipynb)
+1. [RLeXplore with RLLTE](./1%20rlexplore_with_rllte.ipynb)
 2. [RLeXplore with Stable-Baselines3]()
 3. [RLeXplore with CleanRL]()
 4. [Custom Intrinsic Rewards]()

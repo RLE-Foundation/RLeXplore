@@ -46,8 +46,6 @@ from rllte.xplore.reward import ICM, RIDE, ...
 | Memory-based 	| [NGU](https://arxiv.org/pdf/2002.06038) 	|
 | Information theory-based 	| [RE3](http://proceedings.mlr.press/v139/seo21a/seo21a.pdf) 	|
 
-See [Tutorials: Use Intrinsic Reward and Observation Augmentation](./tutorials/data_augmentation.md) for usage examples.
-
 ## Tutorials
 Click the following links to get the code notebook:
 

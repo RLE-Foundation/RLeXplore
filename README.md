@@ -51,6 +51,6 @@ Click the following links to get the code notebook:
 
 0. [Quick Start](./0%20quick_start.ipynb)
 1. [RLeXplore with RLLTE](./1%20rlexplore_with_rllte.ipynb)
-2. [RLeXplore with Stable-Baselines3]()
-3. [RLeXplore with CleanRL]()
+2. [RLeXplore with Stable-Baselines3](./2%20rlexplore_with_sb3.ipynb)
+3. [RLeXplore with CleanRL](./3%20rlexplore_with_cleanrl.py)
 4. [Custom Intrinsic Rewards]()

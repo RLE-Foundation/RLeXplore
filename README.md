@@ -11,7 +11,7 @@
 
 The workflow of RLeXplore is illustrated as follows:
 <div align=center>
-<img src='./workflow.png' style="width: 85%">
+<img src='./assets/workflow.png' style="width: 85%">
 </div>
 
 # Installation

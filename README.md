@@ -1,6 +1,6 @@
 <div align=center>
 <br>
-<img src='./logo.png' style="width: 70%">
+<img src='./assets/logo.png' style="width: 70%">
 <br>
 
 ## RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning

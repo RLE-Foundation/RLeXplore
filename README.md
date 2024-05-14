@@ -1,11 +1,10 @@
 <div align=center>
 <br>
-<img src='./logo.png' style="width: 85%">
+<img src='./logo.png' style="width: 65%">
 <br>
+
+# RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning
 </div>
-
-
-# RLeXplore: Benchmarking Intrinsic Reward Shaping in Reinforcement Learning
 
 **RLeXplore** is a unified, highly-modularized and plug-and-play toolkit that currently provides high-quality and reliable implementations of eight representative intrinsic reward algorithms. It used to be challenging to compare intrinsic reward algorithms due to various confounding factors, including distinct implementations, optimization strategies, and evaluation methodologies. Therefore, RLeXplore is designed to provide unified and standardized procedures for constructing, computing, and optimizing intrinsic reward modules.
 

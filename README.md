@@ -18,7 +18,8 @@ The workflow of RLeXplore is illustrated as follows:
 
 Open a terminal and install **rllte** with `pip`:
 ``` shell
-pip install rllte-core
+conda create -n rllte python=3.8
+pip install rllte-core 
 ```
 
 - with git
@@ -26,13 +27,10 @@ pip install rllte-core
 Open a terminal and clone the repository from [GitHub](https://github.com/RLE-Foundation/rllte) with `git`:
 ``` sh
 git clone https://github.com/RLE-Foundation/rllte.git
-```
-After that, run the following command to install package and dependencies:
-``` sh
-pip install -e . 
+pip install -e .
 ```
 
-Finally, you can invoke the intrinsic reward module by:
+Now you can invoke the intrinsic reward module by:
 ``` python
 from rllte.xplore.reward import ICM, RIDE, ...
 ```

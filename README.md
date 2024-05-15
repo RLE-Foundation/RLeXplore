@@ -52,3 +52,24 @@ Click the following links to get the code notebook:
 3. [RLeXplore with CleanRL](./3%20rlexplore_with_cleanrl.py)
 4. [Exploring Mixed Intrinsic Rewards](./4%20mixed_intrinsic_rewards.ipynb)
 4. [Custom Intrinsic Rewards](./5%20custom_intrinsic_reward.ipynb)
+
+## Benchmark Results
+- `RLLTE's PPO+RLeXplore` on *SuperMarioBros*:
+
+<div align=center>
+<img src='./assets/smb_best.png' style="width: 70%">
+</center>
+
+- `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:
+
+
+## Cite Us
+To cite this repository in publications:
+``` bib
+@software{yuan_roger@rlexplore,
+	author = {Mingqi Yuan and Roger Creus Castanyer and Bo Li and Xin Jin and Glen Berseth and Wenjun Zeng},
+	title = {RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning},
+	url = {https://github.com/Farama-Foundation/Minigrid},
+	year = {2024},
+}
+```

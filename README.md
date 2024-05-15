@@ -73,7 +73,7 @@ To cite this repository in publications:
 @software{yuan_roger@rlexplore,
 	author = {Mingqi Yuan and Roger Creus Castanyer and Bo Li and Xin Jin and Glen Berseth and Wenjun Zeng},
 	title = {RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning},
-	url = {https://github.com/Farama-Foundation/Minigrid},
+	url = {https://github.com/RLE-Foundation/RLeXplore},
 	year = {2024},
 }
 ```

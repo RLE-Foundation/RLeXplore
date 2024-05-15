@@ -50,5 +50,5 @@ Click the following links to get the code notebook:
 1. [RLeXplore with RLLTE](./1%20rlexplore_with_rllte.ipynb)
 2. [RLeXplore with Stable-Baselines3](./2%20rlexplore_with_sb3.ipynb)
 3. [RLeXplore with CleanRL](./3%20rlexplore_with_cleanrl.py)
-4. [Exploring mixed Intrinsic Rewards](./4%20mixed_intrinsic_rewards.ipynb)
+4. [Exploring Mixed Intrinsic Rewards](./4%20mixed_intrinsic_rewards.ipynb)
 4. [Custom Intrinsic Rewards](./5%20custom_intrinsic_reward.ipynb)

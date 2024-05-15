@@ -62,6 +62,9 @@ Click the following links to get the code notebook:
 
 - `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:
 
+<div align=center>
+<img src='./assets/atari_curves.png' style="width: 70%">
+</div>
 
 ## Cite Us
 To cite this repository in publications:

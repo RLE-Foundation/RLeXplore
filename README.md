@@ -58,13 +58,14 @@ Click the following links to get the code notebook:
 
 <div align=center>
 <img src='./assets/smb_best.png' style="width: 70%">
-</center>
+</div>
 
 - `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:
 
 
 ## Cite Us
 To cite this repository in publications:
+
 ``` bib
 @software{yuan_roger@rlexplore,
 	author = {Mingqi Yuan and Roger Creus Castanyer and Bo Li and Xin Jin and Glen Berseth and Wenjun Zeng},

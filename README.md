@@ -70,10 +70,10 @@ Click the following links to get the code notebook:
 To cite this repository in publications:
 
 ``` bib
-@software{yuan_roger@rlexplore,
-	author = {Mingqi Yuan and Roger Creus Castanyer and Bo Li and Xin Jin and Glen Berseth and Wenjun Zeng},
-	title = {RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning},
-	url = {https://github.com/RLE-Foundation/RLeXplore},
-	year = {2024},
+@article{yuan_roger2024rlexplore,
+  title={RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning},
+  author={Yuan, Mingqi and Castanyer, Roger Creus and Li, Bo and Jin, Xin and Berseth, Glen and Zeng, Wenjun},
+  journal={arXiv preprint arXiv:2405.19548},
+  year={2024}
 }
 ```

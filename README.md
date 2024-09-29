@@ -71,7 +71,7 @@ Click the following links to get the code notebook:
 
 <div align=center>
 <img src='./assets/mgd.png' style="width: 100%">
-<img src='./assets/mgd_hard.png' style="width: 100%">
+<img src='./assets/mg_hard.png' style="width: 100%">
 </div>
 
 - `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:

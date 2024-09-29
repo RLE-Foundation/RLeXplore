@@ -69,15 +69,44 @@ Click the following links to get the code notebook:
 
 - `RLLTE's PPO+RLeXplore` on *MiniGrid*:
 
+  1. DoorKey-16×16
 <div align=center>
 <img src='./assets/mgd.png' style="width: 100%">
+</div>
+
+  2. KeyCorridorS8R5, KeyCorridorS9R6, KeyCorridorS10R7, MultiRoom-N7-S8, MultiRoom-N10-S10, MultiRoom-N12-S10,	Dynamic-Obstacles-16x16,	and LockedRoom
+<div align=center>
 <img src='./assets/mg_hard.png' style="width: 100%">
 </div>
+
+- `RLLTE's PPO+RLeXplore` on five hard-exploration tasks of *ALE*:
+
+\begin{table}[]
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+**Algorithm** & **Gravitar**     & **MontezumaRevenge** & **PrivateEye**   & **Seaquest**     & **Venture**     \\ \hline
+Extrinsic     & \textbf{1060.19} & 42.83                & 88.37            & 942.37           & 391.73          \\ \hline
+Disagreement  & 689.12           & 0.00                 & 33.23            & 6577.03          & 468.43          \\ \hline
+E3B           & 503.43           & 0.50                 & 66.23            & \textbf{8690.65} & 0.80            \\ \hline
+ICM           & 194.71           & 31.14                & -27.50           & 2626.13          & 0.54            \\ \hline
+PseudoCounts  & 295.49           & 0.00                 & \textbf{1076.74} & 668.96           & 1.03            \\ \hline
+RE3           & 130.00           & 2.68                 & 312.72           & 864.60           & 0.06            \\ \hline
+RIDE          & 452.53           & 0.00                 & -1.40            & 1024.39          & 404.81          \\ \hline
+RND           & 835.57           & \textbf{160.22}      & 45.85            & 5989.06          & \textbf{544.73} \\ \hline
+\end{tabular}
+\end{table}
 
 - `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:
 
 <div align=center>
 <img src='./assets/atari_curves.png' style="width: 70%">
+</div>
+
+
+- `RLLTE's SAC+RLeXplore` on *Ant-UMaze*:
+
+<div align=center>
+<img src='./assets/sac_ant.png' style="width: 70%">
 </div>
 
 ## Cite Us

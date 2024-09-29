@@ -64,7 +64,14 @@ Click the following links to get the code notebook:
 - `RLLTE's PPO+RLeXplore` on *SuperMarioBros*:
 
 <div align=center>
-<img src='./assets/smb_best.png' style="width: 70%">
+<img src='./assets/smb.png' style="width: 100%">
+</div>
+
+- `RLLTE's PPO+RLeXplore` on *MiniGrid*:
+
+<div align=center>
+<img src='./assets/mgd.png' style="width: 100%">
+<img src='./assets/mgd_hard.png' style="width: 100%">
 </div>
 
 - `CleanRL's PPO+RLeXplore's RND` on *Montezuma's Revenge*:

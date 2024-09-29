@@ -69,15 +69,15 @@ Click the following links to get the code notebook:
 
 - `RLLTE's PPO+RLeXplore` on *MiniGrid*:
 
-  1. DoorKey-16×16
-<div align=center>
-<img src='./assets/mgd.png' style="width: 100%">
-</div>
+  + DoorKey-16×16
+  <div align=center>
+  <img src='./assets/mgd.png' style="width: 100%">
+  </div>
 
-  2. KeyCorridorS8R5, KeyCorridorS9R6, KeyCorridorS10R7, MultiRoom-N7-S8, MultiRoom-N10-S10, MultiRoom-N12-S10,	Dynamic-Obstacles-16x16,	and LockedRoom
-<div align=center>
-<img src='./assets/mg_hard.png' style="width: 100%">
-</div>
+  + KeyCorridorS8R5, KeyCorridorS9R6, KeyCorridorS10R7, MultiRoom-N7-S8, MultiRoom-N10-S10, MultiRoom-N12-S10,	Dynamic-Obstacles-16x16,	and LockedRoom
+  <div align=center>
+  <img src='./assets/mg_hard.png' style="width: 100%">
+  </div>
 
 - `RLLTE's PPO+RLeXplore` on five hard-exploration tasks of *ALE*:
 

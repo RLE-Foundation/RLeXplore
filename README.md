@@ -10,8 +10,15 @@
 
 The workflow of RLeXplore is illustrated as follows:
 <div align=center>
-<img src='./assets/workflow_.png' style="width: 85%">
+<img src='./assets/workflow.png' style="width: 100%">
 </div>
+
+# Table of Contents
+- [Installation](#installation)
+- [Module List](#module-list)
+- [Tutorials](#tutorials)
+- [Benchmark Results](#benchmark-results)
+- [Cite Us](#cite-us)
 
 # Installation
 - with pip `recommended`

@@ -57,10 +57,17 @@ Click the following links to get the code notebook:
 1. [RLeXplore with RLLTE](./1%20rlexplore_with_rllte.ipynb)
 2. [RLeXplore with Stable-Baselines3](./2%20rlexplore_with_sb3.ipynb)
 3. [RLeXplore with CleanRL](./3%20rlexplore_with_cleanrl.py)
-4. [Exploring Mixed Intrinsic Rewards](./4%20mixed_intrinsic_rewards.ipynb)
+4. [Exploring Hybrid Intrinsic Rewards](./4%20hybrid_intrinsic_rewards.ipynb)
 4. [Custom Intrinsic Rewards](./5%20custom_intrinsic_reward.ipynb)
 
 ## Benchmark Results
+We have published a space using Weights & Biases (W&B) to store reusable experiment results on recognized benchmarks. The space link is: [RLeXplore's W&B Space](https://wandb.ai/rle-foundation/rlexplore).
+
+<div align=center>
+<img src='./assets/wandb.png' style="width: 75%">
+</div>
+
+
 - `RLLTE's PPO+RLeXplore` on *SuperMarioBros*:
 
 <div align=center>
@@ -79,10 +86,22 @@ Click the following links to get the code notebook:
   <img src='./assets/mg_hard.png' style="width: 100%">
   </div>
 
+- `RLLTE's PPO+RLeXplore` on *Procgen-Maze*:
+
+  + Number of levels=1
+  <div align=center>
+  <img src='./assets/procgen_1maze.png' style="width: 100%">
+  </div>
+
+  + Number of levels=200
+  <div align=center>
+  <img src='./assets/procgen_allmaze.png' style="width: 100%">
+  </div>
+
 - `RLLTE's PPO+RLeXplore` on five hard-exploration tasks of *ALE*:
 
 | **Algorithm** | **Gravitar** | **MontezumaRevenge** | **PrivateEye** | **Seaquest** | **Venture** |
-|---------------|:------------:|:--------------------:|:--------------:|:------------:|:-----------:|
+|:-------------:|:------------:|:--------------------:|:--------------:|:------------:|:-----------:|
 | Extrinsic     |  **1060.19** |         42.83        |      88.37     |    942.37    |    391.73   |
 | Disagreement  |    689.12    |         0.00         |      33.23     |    6577.03   |    468.43   |
 | E3B           |    503.43    |         0.50         |      66.23     |  **8690.65** |     0.80    |

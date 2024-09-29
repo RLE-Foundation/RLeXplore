@@ -61,7 +61,7 @@ Click the following links to get the code notebook:
 4. [Custom Intrinsic Rewards](./5%20custom_intrinsic_reward.ipynb)
 
 ## Benchmark Results
-We have published a space using Weights & Biases (W&B) to store reusable experiment results on recognized benchmarks. The space link is: [RLeXplore's W&B Space](https://wandb.ai/rle-foundation/rlexplore).
+We have published a space using Weights & Biases (W&B) to store reusable experiment results on recognized benchmarks. The space link is: [RLeXplore's W&B Space](https://wandb.ai/yuanmingqi/RLeXplore/reportlist).
 
 <div align=center>
 <img src='./assets/wandb.png' style="width: 75%">

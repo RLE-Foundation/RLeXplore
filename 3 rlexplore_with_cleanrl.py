@@ -251,10 +251,6 @@ if __name__ == "__main__":
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
 
         # ===================== compute the intrinsic rewards ===================== #
-        next_obs = obs.clone()
-        next_obs[:-1] = obs[1:]
-        next_obs[-1] = next_obs
-
         # get real next observations
         real_next_obs = obs.clone()
         real_next_obs[:-1] = obs[1:]

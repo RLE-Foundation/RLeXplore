@@ -128,10 +128,13 @@ We have published a space using Weights & Biases (W&B) to store reusable experim
 To cite this repository in publications:
 
 ``` bib
-@article{yuan_roger2024rlexplore,
+@article{yuan_roger2025rlexplore,
   title={RLeXplore: Accelerating Research in Intrinsically-Motivated Reinforcement Learning},
   author={Yuan, Mingqi and Castanyer, Roger Creus and Li, Bo and Jin, Xin and Berseth, Glen and Zeng, Wenjun},
-  journal={arXiv preprint arXiv:2405.19548},
-  year={2024}
+  journal={Transactions on Machine Learning Research},
+  issn={2835-8856},
+  year={2025},
+  url={https://openreview.net/forum?id=B9BHjTN4z6},
+  note={}
 }
 ```
